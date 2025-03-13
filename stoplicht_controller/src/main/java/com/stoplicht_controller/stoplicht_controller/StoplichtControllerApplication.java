@@ -23,6 +23,13 @@ public class StoplichtControllerApplication {
     }
     // You can create a method to publish the traffic light state
     public void publishTrafficLightState() {
-        trafficlightStatePublisher.publish();
+        while(true) {
+            trafficlightStatePublisher.publish();
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }
