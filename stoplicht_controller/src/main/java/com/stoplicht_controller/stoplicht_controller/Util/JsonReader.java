@@ -1,13 +1,12 @@
-package com.stoplicht_controller.stoplicht_controller.Services;
+package com.stoplicht_controller.stoplicht_controller.Util;
 
 import Config.TrafficLightConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.stereotype.Service;
-
+import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.net.URL;
 
-@Service
+@Component
 public class JsonReader {
     public static TrafficLightConfig getTrafficLightConfigFromSpec () {
         String url = "https://raw.githubusercontent.com/jorrit200/stoplicht-communicatie-spec/main/intersectionData/lanes.json";

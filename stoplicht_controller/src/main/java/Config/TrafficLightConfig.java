@@ -30,8 +30,6 @@ public class TrafficLightConfig {
         private TransitionRequirements transitionRequirements;
         @JsonProperty("transition_blockers")
         private TransitionRequirements transitionBlockers;
-
-        // Getters en setters
     }
 
     @Getter
@@ -40,9 +38,8 @@ public class TrafficLightConfig {
         private Object isInverseOf; // Kan een nummer of string zijn
         @JsonProperty("extends_to")
         private Object extendsTo; // Kan een nummer of string zijn
-
-        // Getters en setters
     }
+
     @Getter
     public static class Sensor {
         private List<String> vehicles;
@@ -53,8 +50,6 @@ public class TrafficLightConfig {
         private List<TransitionRequirement> green;
         private List<TransitionRequirement> orange;
         private List<TransitionRequirement> red;
-
-        // Getters en setters
     }
 
     @Getter
@@ -66,7 +61,5 @@ public class TrafficLightConfig {
         private Integer group;
         @JsonProperty("traffic_light_state")
         private String trafficLightState;
-
-        // Getters en setters
     }
 }

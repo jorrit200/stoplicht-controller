@@ -1,13 +1,11 @@
 package com.stoplicht_controller.stoplicht_controller.Services;
 
-import lombok.val;
+import com.stoplicht_controller.stoplicht_controller.Util.JsonReader;
 import org.junit.jupiter.api.Test;
-import org.springframework.util.Assert;
 
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.joining;
-import static org.junit.jupiter.api.Assertions.*;
 
 class JsonReaderTest {
     @Test

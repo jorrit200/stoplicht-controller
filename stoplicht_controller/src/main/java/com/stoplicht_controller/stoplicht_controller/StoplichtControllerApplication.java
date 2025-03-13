@@ -12,6 +12,7 @@ public class StoplichtControllerApplication {
     @Autowired
     private TrafficlightStatePublisher trafficlightStatePublisher;
 
+
     public static void main(String[] args) {
         SpringApplication.run(StoplichtControllerApplication.class, args);
     }

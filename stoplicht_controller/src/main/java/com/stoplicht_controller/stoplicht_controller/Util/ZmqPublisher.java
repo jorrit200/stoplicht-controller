@@ -1,11 +1,11 @@
-package com.stoplicht_controller.stoplicht_controller.Services;
+package com.stoplicht_controller.stoplicht_controller.Util;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.zeromq.SocketType;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 
-@Service
+@Component
 public class ZmqPublisher {
     @SuppressWarnings("FieldCanBeLocal")
     private final ZContext context;

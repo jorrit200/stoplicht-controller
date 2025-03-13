@@ -1,6 +1,7 @@
 package com.stoplicht_controller.stoplicht_controller.Services;
 
 import com.stoplicht_controller.stoplicht_controller.Entities.TrafficLights;
+import com.stoplicht_controller.stoplicht_controller.Util.ZmqPublisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
