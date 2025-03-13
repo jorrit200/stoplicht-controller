@@ -27,7 +27,7 @@ public class StoplichtControllerApplication {
             trafficlightStatePublisher.publish();
             try {
                 Thread.sleep(2000);
-            } catch (InterruptedException e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }

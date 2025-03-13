@@ -3,6 +3,7 @@ package com.stoplicht_controller.stoplicht_controller.Services;
 import com.stoplicht_controller.stoplicht_controller.Entities.TrafficLights;
 import com.stoplicht_controller.stoplicht_controller.Util.ZmqPublisher;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,7 +21,11 @@ public class TrafficlightStatePublisher {
     }
 
     public void publish() {
-        publisher.sendMessage("stoplichten", trafficLights.toString());
+        try {
+            publisher.sendMessage("stoplichten", trafficLights.fillTrafficLights());
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
