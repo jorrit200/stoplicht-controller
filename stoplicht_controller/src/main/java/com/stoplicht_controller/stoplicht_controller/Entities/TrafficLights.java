@@ -11,17 +11,17 @@ import java.util.Hashtable;
 
 @Service
 public class TrafficLights {
-    public Dictionary<Integer, TrafficlightState> trafficLights = new Hashtable<Integer, TrafficlightState>();
+    public Dictionary<String, TrafficlightState> trafficLights = new Hashtable<String, TrafficlightState>();
 
     public TrafficLights() {
         TrafficLightConfig trafficLightConfigFromSpec = JsonReader.getTrafficLightConfigFromSpec();
         trafficLightConfigFromSpec.getGroups().keySet()
-                .forEach(groupKey -> trafficLights.put(groupKey, TrafficlightState.rood));
+                .forEach(groupKey -> trafficLights.put(groupKey.toString(), TrafficlightState.rood));
     }
 
     public String fillTrafficLights() throws JSONException {
         try {
-            trafficLights.put(1, TrafficlightState.groen); // Voeg de waarde toe
+            trafficLights.put("1.1", TrafficlightState.groen); // Voeg de waarde toe
 
             ObjectMapper objectMapper = new ObjectMapper();
             String json = objectMapper.writeValueAsString(trafficLights); // Serialiseer de hele map
