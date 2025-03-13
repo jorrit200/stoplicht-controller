@@ -17,7 +17,7 @@ public class ZmqPublisher {
         // Create a PUB socket
         this.publisherSocket = context.createSocket(SocketType.PUB);
         // Bind the socket to an address
-        this.publisherSocket.bind("tcp://*:5555");
+        this.publisherSocket.bind("tcp://*:5556");
     }
 
     public void sendMessage(String topic, String message) {
