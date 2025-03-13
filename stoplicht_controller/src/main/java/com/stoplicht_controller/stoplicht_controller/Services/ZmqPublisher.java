@@ -1,4 +1,4 @@
-package com.stoplicht_controller.stoplicht_controller.Services;
+package com.stoplicht_controller.stoplicht_controller.services;
 
 import org.springframework.stereotype.Service;
 import org.zeromq.SocketType;

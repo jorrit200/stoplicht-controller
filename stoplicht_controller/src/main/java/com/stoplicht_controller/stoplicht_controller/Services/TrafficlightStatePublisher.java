@@ -1,4 +1,4 @@
-package com.stoplicht_controller.stoplicht_controller.Services;
+package com.stoplicht_controller.stoplicht_controller.services;
 
 import com.stoplicht_controller.stoplicht_controller.Entities.TrafficLights;
 import com.stoplicht_controller.stoplicht_controller.Enums.TrafficlightState;
