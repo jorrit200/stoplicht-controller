@@ -1,6 +1,7 @@
 package com.stoplicht_controller.stoplicht_controller.Entities;
 
 import Config.TrafficLightConfig;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stoplicht_controller.stoplicht_controller.Enums.TrafficlightState;
 import com.stoplicht_controller.stoplicht_controller.Util.JsonReader;
 import org.apache.catalina.webresources.StandardRoot;
@@ -23,12 +24,12 @@ public class TrafficLights {
     public String fillTrafficLights() throws JSONException {
         try{
             var test =  trafficLights.put(1, TrafficlightState.GROEN);
-            JSONObject trafficLightsJSON = new JSONObject(String.valueOf(test));
 
-            return trafficLightsJSON.toString();
+            ObjectMapper objectMapper = new ObjectMapper();
+            String json = objectMapper.writeValueAsString(test);
 
-        } catch (JSONException e) {
-            throw e;
+            return json;
+
         } catch (Exception e) {
             throw new RuntimeException("An error occurred while filling traffic lights", e);
         }
