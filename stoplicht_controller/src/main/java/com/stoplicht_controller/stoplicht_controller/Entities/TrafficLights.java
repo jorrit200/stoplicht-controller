@@ -22,18 +22,17 @@ public class TrafficLights {
     }
 
     public String fillTrafficLights() throws JSONException {
-        try{
-            var test =  trafficLights.put(1, TrafficlightState.GROEN);
+        try {
+            trafficLights.put(1, TrafficlightState.GROEN); // Voeg de waarde toe
 
             ObjectMapper objectMapper = new ObjectMapper();
-            String json = objectMapper.writeValueAsString(test);
-
+            String json = objectMapper.writeValueAsString(trafficLights); // Serialiseer de hele map
+            System.out.println(json);
             return json;
 
         } catch (Exception e) {
             throw new RuntimeException("An error occurred while filling traffic lights", e);
         }
-
     }
 
 }
