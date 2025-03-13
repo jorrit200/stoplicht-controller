@@ -1,4 +1,4 @@
-package com.stoplicht_controller.stoplicht_controller.services;
+package com.stoplicht_controller.stoplicht_controller.Services;
 
 import org.springframework.stereotype.Service;
 import org.zeromq.SocketType;
@@ -21,9 +21,9 @@ public class ZmqPublisher {
     }
 
     public void sendMessage(String topic, String message) {
-        String fullMessage = topic + " " + message;
-        publisherSocket.send(fullMessage.getBytes(ZMQ.CHARSET), 0);
-        System.out.println("Sent: " + fullMessage);
+        publisherSocket.sendMore(topic.getBytes());
+        publisherSocket.send(message.getBytes(ZMQ.CHARSET), 0);
+        System.out.println("Sent: " + message);
     }
 
     public void close() {

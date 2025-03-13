@@ -2,7 +2,7 @@ package com.stoplicht_controller.stoplicht_controller.Entities;
 
 import Config.TrafficLightConfig;
 import com.stoplicht_controller.stoplicht_controller.Enums.TrafficlightState;
-import com.stoplicht_controller.stoplicht_controller.services.JsonReader;
+import com.stoplicht_controller.stoplicht_controller.Services.JsonReader;
 import org.springframework.stereotype.Service;
 
 import java.util.Dictionary;

@@ -1,4 +1,4 @@
-package com.stoplicht_controller.stoplicht_controller.services;
+package com.stoplicht_controller.stoplicht_controller.Services;
 
 import Config.TrafficLightConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;

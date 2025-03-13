@@ -1,7 +1,6 @@
-package com.stoplicht_controller.stoplicht_controller.services;
+package com.stoplicht_controller.stoplicht_controller.Services;
 
 import com.stoplicht_controller.stoplicht_controller.Entities.TrafficLights;
-import com.stoplicht_controller.stoplicht_controller.Enums.TrafficlightState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
