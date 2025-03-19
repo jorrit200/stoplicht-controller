@@ -35,7 +35,7 @@ public class TrafficlightStatePublisher {
             trafficlight.trafficLights.put("1.1", TrafficlightState.groen); // Voeg de waarde toe
 
             ObjectMapper objectMapper = new ObjectMapper();
-            String json = objectMapper.writeValueAsString(trafficlight); // Serialiseer de hele map
+            String json = objectMapper.writeValueAsString(trafficlight.trafficLights); // Serialiseer de hele map
             System.out.println(json);
             return json;
 
