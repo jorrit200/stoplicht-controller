@@ -1,7 +1,6 @@
-package Config;
+package com.stoplicht_controller.stoplicht_controller.Models;
 
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
 public class SensorenSpeciaal {

@@ -1,8 +1,7 @@
-package Config;
+package com.stoplicht_controller.stoplicht_controller.Models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.Map;
 

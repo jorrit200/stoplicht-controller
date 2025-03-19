@@ -1,6 +1,5 @@
-package com.stoplicht_controller.stoplicht_controller.Entities;
+package com.stoplicht_controller.stoplicht_controller.Models;
 
-import Config.IntersectionData;
 import com.stoplicht_controller.stoplicht_controller.Enums.TrafficlightState;
 import com.stoplicht_controller.stoplicht_controller.Util.JsonReader;
 import org.springframework.stereotype.Service;
