@@ -3,9 +3,9 @@ package com.stoplicht_controller.stoplicht_controller.Services;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stoplicht_controller.stoplicht_controller.Configurations.ZmqSubscriber;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service
 public class JsonMessageReceiver {
     private final ZmqSubscriber subscriber;
     private final ObjectMapper mapper;
