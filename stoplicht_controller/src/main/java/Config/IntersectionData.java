@@ -9,7 +9,7 @@ import java.util.Map;
 
 @Getter
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class TrafficLightConfig {
+public class IntersectionData {
     private Map<Integer, Group> groups;
     private Map<String, Sensor> sensors;
 

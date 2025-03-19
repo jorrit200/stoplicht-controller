@@ -21,7 +21,7 @@ public class StoplichtControllerApplication {
     public void init() {
         publishTrafficLightState();
     }
-    // You can create a method to publish the traffic light state
+
     public void publishTrafficLightState() {
         while(true) {
             trafficlightStatePublisher.publish();
