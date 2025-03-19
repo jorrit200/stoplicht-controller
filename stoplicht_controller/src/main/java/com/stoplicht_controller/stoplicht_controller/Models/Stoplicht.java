@@ -1,4 +1,4 @@
-package Config;
+package com.stoplicht_controller.stoplicht_controller.Models;
 
 import com.stoplicht_controller.stoplicht_controller.Enums.TrafficlightState;
 import lombok.Getter;

@@ -1,11 +1,11 @@
-package com.stoplicht_controller.stoplicht_controller.Services;
+package com.stoplicht_controller.stoplicht_controller.Controllers;
 
-import Config.*;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.stoplicht_controller.stoplicht_controller.Configurations.ZmqPublisher;
-import com.stoplicht_controller.stoplicht_controller.Configurations.ZmqSubscriber;
-import com.stoplicht_controller.stoplicht_controller.Util.JsonReader;
-import lombok.val;
+import com.stoplicht_controller.stoplicht_controller.Configurations.*;
+import com.stoplicht_controller.stoplicht_controller.Models.SensorenRijbaan;
+import com.stoplicht_controller.stoplicht_controller.Models.SensorenSpeciaal;
+import com.stoplicht_controller.stoplicht_controller.Models.Tijd;
+import com.stoplicht_controller.stoplicht_controller.Models.VoorrangsvoertuigRij;
+import com.stoplicht_controller.stoplicht_controller.Services.JsonMessageReceiver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

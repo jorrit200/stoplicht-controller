@@ -1,7 +1,7 @@
 package com.stoplicht_controller.stoplicht_controller.Util;
 
-import Config.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.stoplicht_controller.stoplicht_controller.Models.*;
 import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.net.URL;

@@ -1,7 +1,7 @@
 package com.stoplicht_controller.stoplicht_controller.Services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.stoplicht_controller.stoplicht_controller.Entities.TrafficLights;
+import com.stoplicht_controller.stoplicht_controller.Models.TrafficLights;
 import com.stoplicht_controller.stoplicht_controller.Configurations.ZmqPublisher;
 import com.stoplicht_controller.stoplicht_controller.Enums.TrafficlightState;
 import org.springframework.beans.factory.annotation.Autowired;
