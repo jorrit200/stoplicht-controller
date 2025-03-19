@@ -41,12 +41,12 @@ public class JsonReader {
         }
     }
 
-    public static Stoplichten GetStoplichtenConfigFromSpec(){
+    public static Stoplicht GetStoplichtenConfigFromSpec(){
         String url = "https://raw.githubusercontent.com/jorrit200/stoplicht-communicatie-spec/refs/heads/main/topics/stoplichten/topic.json";
         ObjectMapper objectMapper = new ObjectMapper();
 
         try{
-            return objectMapper.readValue(new URL(url), Stoplichten.class);
+            return objectMapper.readValue(new URL(url), Stoplicht.class);
         } catch (IOException e){
             throw new RuntimeException(e);
         }
