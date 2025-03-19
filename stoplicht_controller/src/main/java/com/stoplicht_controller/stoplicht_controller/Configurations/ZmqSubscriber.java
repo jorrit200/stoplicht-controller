@@ -18,7 +18,7 @@ public class ZmqSubscriber {
 
     public String receiveMessage(String topic) {
         subscriber.subscribe(topic.getBytes(ZMQ.CHARSET));
-        String contents = subscriber.recvStr(0).trim();
+        String contents = subscriber.recvStr(100).trim();
         System.out.println(contents);
         return contents;
     }

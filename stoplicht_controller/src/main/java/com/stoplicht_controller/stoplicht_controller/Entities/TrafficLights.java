@@ -1,6 +1,6 @@
 package com.stoplicht_controller.stoplicht_controller.Entities;
 
-import Config.TrafficLightConfig;
+import Config.IntersectionData;
 import com.stoplicht_controller.stoplicht_controller.Enums.TrafficlightState;
 import com.stoplicht_controller.stoplicht_controller.Util.JsonReader;
 import org.springframework.stereotype.Service;
@@ -12,8 +12,8 @@ public class TrafficLights {
     public Dictionary<String, TrafficlightState> trafficLights = new Hashtable<String, TrafficlightState>();
 
     public TrafficLights() {
-        TrafficLightConfig trafficLightConfigFromSpec = JsonReader.getTrafficLightConfigFromSpec();
-        trafficLightConfigFromSpec.getGroups().keySet()
+        IntersectionData intersectionDataFromSpec = JsonReader.getTrafficLightConfigFromSpec();
+        intersectionDataFromSpec.getGroups().keySet()
                 .forEach(groupKey -> trafficLights.put(groupKey.toString(), TrafficlightState.rood));
     }
 }
