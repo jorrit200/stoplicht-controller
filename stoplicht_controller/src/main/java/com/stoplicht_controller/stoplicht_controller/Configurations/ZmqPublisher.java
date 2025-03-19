@@ -1,11 +1,11 @@
 package com.stoplicht_controller.stoplicht_controller.Configurations;
 
-import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.context.annotation.Configuration;
 import org.zeromq.SocketType;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 
-@Configurable
+@Configuration
 public class ZmqPublisher {
     private final ZContext context;
     private final ZMQ.Socket publisherSocket;
