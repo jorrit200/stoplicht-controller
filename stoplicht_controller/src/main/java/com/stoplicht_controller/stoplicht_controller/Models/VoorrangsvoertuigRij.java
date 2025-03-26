@@ -16,5 +16,6 @@ public class VoorrangsvoertuigRij {
     public class Voorrangsvoertuig {
         private String baan;
         private int simulatie_tijd_ms;
+        private int positie;
     }
 }

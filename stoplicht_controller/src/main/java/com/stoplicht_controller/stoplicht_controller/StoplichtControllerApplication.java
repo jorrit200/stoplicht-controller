@@ -25,6 +25,7 @@ public class StoplichtControllerApplication {
     public void publishTrafficLightState() {
         while(true) {
             trafficlightStatePublisher.publish();
+
             try {
                 Thread.sleep(2000);
             } catch (Exception e) {

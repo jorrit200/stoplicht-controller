@@ -9,11 +9,13 @@ import org.zeromq.ZMQ;
 public class ZmqPublisher {
     private final ZContext context;
     private final ZMQ.Socket publisherSocket;
+    private final String adress = "tcp://192.168.1.2:5556";
 
     public ZmqPublisher() {
         this.context = new ZContext();
         this.publisherSocket = context.createSocket(SocketType.PUB);
-        this.publisherSocket.bind("tcp://*:5556");
+        this.publisherSocket.bind(adress);
+
     }
 
     public void sendMessage(String topic, String message) {
