@@ -15,8 +15,8 @@ public class TrafficLights {
     public Dictionary<String, TrafficlightState> trafficLights = new Hashtable<String, TrafficlightState>();
 
     public TrafficLights() {
-        IntersectionData intersectionDataFromSpec = JsonReader.getTrafficLightConfigFromSpec();
-        intersectionDataFromSpec.getGroups().keySet()
-                .forEach(groupKey -> trafficLights.put(groupKey.toString(), TrafficlightState.rood));
+//        IntersectionData intersectionDataFromSpec = JsonReader.getTrafficLightConfigFromSpec();
+//        intersectionDataFromSpec.getGroups().keySet()
+//                .forEach(groupKey -> trafficLights.put(groupKey.toString(), TrafficlightState.rood));
     }
 }

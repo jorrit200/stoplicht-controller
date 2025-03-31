@@ -32,7 +32,44 @@ public class TrafficlightStatePublisher {
 
     public String fillTrafficLights(TrafficLights trafficlight) throws JSONException {
         try {
-            trafficlight.trafficLights.put("1.1", TrafficlightState.groen); // Voeg de waarde toe
+            trafficlight.trafficLights.put("1.1", TrafficlightState.groen);
+            trafficlight.trafficLights.put("2.1", TrafficlightState.groen);
+            trafficlight.trafficLights.put("2.2", TrafficlightState.groen);
+            trafficlight.trafficLights.put("3.1", TrafficlightState.groen);
+            trafficlight.trafficLights.put("4.1", TrafficlightState.groen);
+            trafficlight.trafficLights.put("5.1", TrafficlightState.groen);
+            trafficlight.trafficLights.put("6.1", TrafficlightState.groen);
+            trafficlight.trafficLights.put("7.1", TrafficlightState.groen);
+            trafficlight.trafficLights.put("8.1", TrafficlightState.groen);
+            trafficlight.trafficLights.put("8.2", TrafficlightState.groen);
+            trafficlight.trafficLights.put("9.1", TrafficlightState.groen);
+            trafficlight.trafficLights.put("10.1", TrafficlightState.groen);
+            trafficlight.trafficLights.put("11.1", TrafficlightState.groen);
+            trafficlight.trafficLights.put("12.1", TrafficlightState.groen);
+            trafficlight.trafficLights.put("21.1", TrafficlightState.groen);
+            trafficlight.trafficLights.put("22.1", TrafficlightState.groen);
+            trafficlight.trafficLights.put("24.1", TrafficlightState.groen);
+            trafficlight.trafficLights.put("25.1", TrafficlightState.groen);
+            trafficlight.trafficLights.put("26.1", TrafficlightState.groen);
+            trafficlight.trafficLights.put("27.1", TrafficlightState.groen);
+            trafficlight.trafficLights.put("27.2", TrafficlightState.groen);
+            trafficlight.trafficLights.put("28.1", TrafficlightState.groen);
+            trafficlight.trafficLights.put("31.1", TrafficlightState.groen);
+            trafficlight.trafficLights.put("31.2", TrafficlightState.groen);
+            trafficlight.trafficLights.put("32.1", TrafficlightState.groen);
+            trafficlight.trafficLights.put("32.2", TrafficlightState.groen);
+            trafficlight.trafficLights.put("33.1", TrafficlightState.groen);
+            trafficlight.trafficLights.put("33.2", TrafficlightState.groen);
+            trafficlight.trafficLights.put("34.1", TrafficlightState.groen);
+            trafficlight.trafficLights.put("34.2", TrafficlightState.groen);
+            trafficlight.trafficLights.put("35.1", TrafficlightState.groen);
+            trafficlight.trafficLights.put("35.2", TrafficlightState.groen);
+            trafficlight.trafficLights.put("36", TrafficlightState.groen);
+            trafficlight.trafficLights.put("36.1", TrafficlightState.groen);
+            trafficlight.trafficLights.put("37.1", TrafficlightState.groen);
+            trafficlight.trafficLights.put("37.2", TrafficlightState.groen);
+            trafficlight.trafficLights.put("38.1", TrafficlightState.groen);
+            trafficlight.trafficLights.put("38.2", TrafficlightState.groen);
 
             ObjectMapper objectMapper = new ObjectMapper();
             String json = objectMapper.writeValueAsString(trafficlight.trafficLights); // Serialiseer de hele map

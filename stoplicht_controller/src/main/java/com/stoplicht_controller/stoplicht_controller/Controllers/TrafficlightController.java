@@ -1,5 +1,6 @@
 package com.stoplicht_controller.stoplicht_controller.Controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stoplicht_controller.stoplicht_controller.Configurations.*;
 import com.stoplicht_controller.stoplicht_controller.Enums.TrafficlightState;
@@ -8,6 +9,11 @@ import com.stoplicht_controller.stoplicht_controller.Services.JsonMessageReceive
 import com.stoplicht_controller.stoplicht_controller.Util.JsonReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Dictionary;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class TrafficlightController {
@@ -19,6 +25,10 @@ public class TrafficlightController {
     @Autowired
     private TrafficLights trafficLights;
     ObjectMapper objectMapper = new ObjectMapper();
+
+
+    IntersectionData intersectionData = JsonReader.getTrafficLightConfigFromSpec();
+
 
 
     public TrafficlightController() {}
@@ -35,8 +45,10 @@ public class TrafficlightController {
                 SensorenRijbaan sensorenRijbaan = jsonMessageReceiver.receiveMessage("sensoren_rijbaan", SensorenRijbaan.class);
                 SensorenSpeciaal sensorenSpeciaal = jsonMessageReceiver.receiveMessage("sensorenSpeciaal", SensorenSpeciaal.class);
 
-//                if(voorrangsvoertuigRij.getQueue())
-
+                if(!voorrangsvoertuigRij.getQueue().isEmpty())
+                {
+                    processPriorityVehicle(voorrangsvoertuigRij);
+                }
                 //Cycles
                 startCycle(tijd, voorrangsvoertuigRij,sensorenRijbaan,sensorenSpeciaal);
 
@@ -51,7 +63,6 @@ public class TrafficlightController {
     }
 
     public void startCycle(Tijd tijd, VoorrangsvoertuigRij voorrangsvoertuigRij, SensorenRijbaan sensorenRijbaan, SensorenSpeciaal sensorenSpeciaal) {
-        IntersectionData intersectionData = JsonReader.getTrafficLightConfigFromSpec();
 
         // Loop over alle verkeerslichtgroepen
         for(Integer groupkey : intersectionData.getGroups().keySet()){
@@ -109,5 +120,40 @@ public class TrafficlightController {
                 }
         }
     }
+
+    public void processPriorityVehicle(VoorrangsvoertuigRij voorrangsvoertuigRij) throws JsonProcessingException {
+        var voertuigen = voorrangsvoertuigRij.getQueue().stream();
+
+        for (VoorrangsvoertuigRij.Voorrangsvoertuig voertuig : voorrangsvoertuigRij.getQueue()){
+            String laneId = voertuig.getBaan();
+            //get groupKey
+            String groupKey = laneId;
+            if(groupKey != null){
+                var group = intersectionData.getGroups().get(groupKey);
+                var conflict = group.getIntersectsWith().stream()
+                        .anyMatch(conflictGroup -> trafficLights.getTrafficLights().get(conflictGroup) == TrafficlightState.groen);
+
+                if(!conflict){
+                    trafficLights.getTrafficLights().put(groupKey, TrafficlightState.groen);
+                }
+            }
+        }
+
+        zmqPublisher.sendMessage("stoplichten", trafficLightsJson(trafficLights.getTrafficLights()));
+        start();
+    }
+
+    public String trafficLightsJson(Dictionary<String, TrafficlightState> trafficLights) throws JsonProcessingException {
+        Map<String, TrafficlightState> trafficLightsMap = new HashMap<>();
+        Enumeration<String> keys = trafficLights.keys();
+        while (keys.hasMoreElements()) {
+            String key = keys.nextElement();
+            trafficLightsMap.put(key, trafficLights.get(key));
+        }
+        return objectMapper.writeValueAsString(trafficLightsMap);
+    }
+
+
+
 
 }
