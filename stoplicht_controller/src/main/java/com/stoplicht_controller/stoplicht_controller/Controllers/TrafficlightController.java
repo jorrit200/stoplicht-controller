@@ -42,7 +42,7 @@ public class TrafficlightController {
         ///  iets met tijd
         while(true){
             try {
-
+                System.out.println("Loop started in controller");
                 Tijd tijd = jsonMessageReceiver.receiveMessage("tijd", Tijd.class);
                 VoorrangsvoertuigRij voorrangsvoertuigRij = jsonMessageReceiver.receiveMessage("voorrangsvoertuig", VoorrangsvoertuigRij.class);
                 SensorenRijbaan sensorenRijbaan = jsonMessageReceiver.receiveMessage("sensoren_rijbaan", SensorenRijbaan.class);
@@ -56,6 +56,8 @@ public class TrafficlightController {
                 startCycle(tijd, voorrangsvoertuigRij,sensorenRijbaan,sensorenSpeciaal);
 
                 String trafficLightsJson = objectMapper.writeValueAsString(trafficLights);
+                System.out.println("about to send message");
+
                 zmqPublisher.sendMessage("stoplichten", trafficLightsJson );
 
             }catch (Exception e){

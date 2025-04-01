@@ -7,6 +7,7 @@ import lombok.Setter;
 import java.util.List;
 
 @Getter
+@Setter
 public class VoorrangsvoertuigRij {
     @JsonProperty("queue")
     private List<Voorrangsvoertuig> queue;
