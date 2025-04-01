@@ -7,7 +7,7 @@ import com.stoplicht_controller.stoplicht_controller.Dtos.SensorenRijbaan;
 import com.stoplicht_controller.stoplicht_controller.Dtos.SensorenSpeciaal;
 import com.stoplicht_controller.stoplicht_controller.Dtos.Tijd;
 import com.stoplicht_controller.stoplicht_controller.Dtos.VoorrangsvoertuigRij;
-import com.stoplicht_controller.stoplicht_controller.Enums.TrafficlightState;
+import com.stoplicht_controller.stoplicht_controller.Enums.LightState;
 import com.stoplicht_controller.stoplicht_controller.Models.*;
 import com.stoplicht_controller.stoplicht_controller.messaging.JsonMessageReceiver;
 import com.stoplicht_controller.stoplicht_controller.Util.JsonReader;
@@ -77,16 +77,17 @@ public class TrafficlightController {
             var conflict = group.getIntersectsWith().stream()
                     .map(Object::toString)
                     //haal uit de trafficlights conflicterende groepen en check of ze groen zijn, trafficLights wordt constant geupdate in een loop dus dit gebeurt uiteindelijk
-                    .anyMatch(conflictGroup-> trafficLights.getStoplichten().get(conflictGroup) == TrafficlightState.groen);
+                    .anyMatch(conflictGroup-> trafficLights.getStoplichten().get(conflictGroup).getLightState() == LightState.groen);
+                            //getStoplichten().get(conflictGroup) == LightState.groen);
 
             // 2. Controleer of de transitievereisten zijn voldaan
             boolean requirementsMet = checkTransitionRequirements(group, sensorenSpeciaal, sensorenRijbaan, voorrangsvoertuigRij);
 
             // 3. Als er geen conflicten zijn en de transitievereisten zijn voldaan, zet het verkeerslicht op groen
             if (!conflict && requirementsMet) {
-                trafficLights.getStoplichten().put(groupkey.toString(), TrafficlightState.groen);
+                trafficLights.getStoplichten().put(groupkey.toString(), new TrafficLight(LightState.groen));
             } else {
-                trafficLights.getStoplichten().put(groupkey.toString(), TrafficlightState.rood);
+                trafficLights.getStoplichten().put(groupkey.toString(), new TrafficLight(LightState.rood));
             }
         }
     }
@@ -135,10 +136,10 @@ public class TrafficlightController {
             if(groupKey != null){
                 var group = intersectionData.getGroups().get(groupKey);
                 var conflict = group.getIntersectsWith().stream()
-                        .anyMatch(conflictGroup -> trafficLights.getStoplichten().get(conflictGroup) == TrafficlightState.groen);
+                        .anyMatch(conflictGroup -> trafficLights.getStoplichten().get(conflictGroup).getLightState()  == LightState.groen);
 
                 if(!conflict){
-                    trafficLights.getStoplichten().put(groupKey, TrafficlightState.groen);
+                    trafficLights.getStoplichten().put(groupKey, new TrafficLight(LightState.groen));
                 }
             }
         }
@@ -147,13 +148,18 @@ public class TrafficlightController {
         start();
     }
 
-    public String trafficLightsJson(Dictionary<String, TrafficlightState> trafficLights) throws JsonProcessingException {
-        Map<String, TrafficlightState> trafficLightsMap = new HashMap<>();
+    //todo check if its right
+    public String trafficLightsJson(Dictionary<String, TrafficLight> trafficLights) throws JsonProcessingException {
+
+        Map<String, TrafficLight> trafficLightsMap = new HashMap<>();
+
         Enumeration<String> keys = trafficLights.keys();
+
         while (keys.hasMoreElements()) {
-            String key = keys.nextElement();
+            String key = keys.nextElement(); //key
             trafficLightsMap.put(key, trafficLights.get(key));
         }
+
         return objectMapper.writeValueAsString(trafficLightsMap);
     }
 }

@@ -1,6 +1,6 @@
 package com.stoplicht_controller.stoplicht_controller.Enums;
 
-public enum TrafficlightState {
+public enum LightState {
     groen,
     oranje,
     rood

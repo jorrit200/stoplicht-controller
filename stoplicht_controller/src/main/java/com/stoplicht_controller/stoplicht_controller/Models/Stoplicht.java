@@ -1,6 +1,6 @@
 package com.stoplicht_controller.stoplicht_controller.Models;
 
-import com.stoplicht_controller.stoplicht_controller.Enums.TrafficlightState;
+import com.stoplicht_controller.stoplicht_controller.Enums.LightState;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
@@ -12,7 +12,9 @@ import java.util.Hashtable;
 @Setter
 @Component
 public class Stoplicht {
-    private Dictionary<String, TrafficlightState> stoplichten = new Hashtable<String, TrafficlightState>();
+    private Dictionary<String, TrafficLight> stoplichten = new Hashtable<String, TrafficLight>();
+//make new object trafficlight met trafficlight state en prioritering
+
 
     public Stoplicht() {}
 }
