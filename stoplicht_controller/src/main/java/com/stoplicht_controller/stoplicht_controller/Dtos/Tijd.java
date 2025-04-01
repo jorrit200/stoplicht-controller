@@ -1,4 +1,4 @@
-package com.stoplicht_controller.stoplicht_controller.Models;
+package com.stoplicht_controller.stoplicht_controller.Dtos;
 
 import lombok.Getter;
 

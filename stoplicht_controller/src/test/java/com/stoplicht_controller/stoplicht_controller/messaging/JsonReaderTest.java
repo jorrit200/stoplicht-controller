@@ -1,4 +1,4 @@
-package com.stoplicht_controller.stoplicht_controller.Services;
+package com.stoplicht_controller.stoplicht_controller.messaging;
 
 import com.stoplicht_controller.stoplicht_controller.Util.JsonReader;
 import org.junit.jupiter.api.Test;

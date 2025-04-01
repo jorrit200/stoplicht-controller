@@ -1,6 +1,10 @@
 package com.stoplicht_controller.stoplicht_controller.Util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.stoplicht_controller.stoplicht_controller.Dtos.SensorenRijbaan;
+import com.stoplicht_controller.stoplicht_controller.Dtos.SensorenSpeciaal;
+import com.stoplicht_controller.stoplicht_controller.Dtos.Tijd;
+import com.stoplicht_controller.stoplicht_controller.Dtos.VoorrangsvoertuigRij;
 import com.stoplicht_controller.stoplicht_controller.Models.*;
 import org.springframework.stereotype.Component;
 import java.io.IOException;

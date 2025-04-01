@@ -3,9 +3,13 @@ package com.stoplicht_controller.stoplicht_controller.Controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stoplicht_controller.stoplicht_controller.Configurations.*;
+import com.stoplicht_controller.stoplicht_controller.Dtos.SensorenRijbaan;
+import com.stoplicht_controller.stoplicht_controller.Dtos.SensorenSpeciaal;
+import com.stoplicht_controller.stoplicht_controller.Dtos.Tijd;
+import com.stoplicht_controller.stoplicht_controller.Dtos.VoorrangsvoertuigRij;
 import com.stoplicht_controller.stoplicht_controller.Enums.TrafficlightState;
 import com.stoplicht_controller.stoplicht_controller.Models.*;
-import com.stoplicht_controller.stoplicht_controller.Services.JsonMessageReceiver;
+import com.stoplicht_controller.stoplicht_controller.messaging.JsonMessageReceiver;
 import com.stoplicht_controller.stoplicht_controller.Util.JsonReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,13 +27,11 @@ public class TrafficlightController {
     @Autowired
     private ZmqPublisher zmqPublisher;
     @Autowired
-    private TrafficLights trafficLights;
+    private Stoplicht trafficLights;
+
     ObjectMapper objectMapper = new ObjectMapper();
 
-
     IntersectionData intersectionData = JsonReader.getTrafficLightConfigFromSpec();
-
-
 
     public TrafficlightController() {}
 
@@ -37,6 +39,7 @@ public class TrafficlightController {
     public void start() {
         /// Puntensysteem, intersectie punten aftrek?
         /// iets met een cyclus
+        ///  iets met tijd
         while(true){
             try {
 
@@ -72,16 +75,16 @@ public class TrafficlightController {
             var conflict = group.getIntersectsWith().stream()
                     .map(Object::toString)
                     //haal uit de trafficlights conflicterende groepen en check of ze groen zijn, trafficLights wordt constant geupdate in een loop dus dit gebeurt uiteindelijk
-                    .anyMatch(conflictGroup-> trafficLights.getTrafficLights().get(conflictGroup) == TrafficlightState.groen);
+                    .anyMatch(conflictGroup-> trafficLights.getStoplichten().get(conflictGroup) == TrafficlightState.groen);
 
             // 2. Controleer of de transitievereisten zijn voldaan
             boolean requirementsMet = checkTransitionRequirements(group, sensorenSpeciaal, sensorenRijbaan, voorrangsvoertuigRij);
 
             // 3. Als er geen conflicten zijn en de transitievereisten zijn voldaan, zet het verkeerslicht op groen
             if (!conflict && requirementsMet) {
-                trafficLights.getTrafficLights().put(groupkey.toString(), TrafficlightState.groen);
+                trafficLights.getStoplichten().put(groupkey.toString(), TrafficlightState.groen);
             } else {
-                trafficLights.getTrafficLights().put(groupkey.toString(), TrafficlightState.rood);
+                trafficLights.getStoplichten().put(groupkey.toString(), TrafficlightState.rood);
             }
         }
     }
@@ -122,7 +125,6 @@ public class TrafficlightController {
     }
 
     public void processPriorityVehicle(VoorrangsvoertuigRij voorrangsvoertuigRij) throws JsonProcessingException {
-        var voertuigen = voorrangsvoertuigRij.getQueue().stream();
 
         for (VoorrangsvoertuigRij.Voorrangsvoertuig voertuig : voorrangsvoertuigRij.getQueue()){
             String laneId = voertuig.getBaan();
@@ -131,15 +133,15 @@ public class TrafficlightController {
             if(groupKey != null){
                 var group = intersectionData.getGroups().get(groupKey);
                 var conflict = group.getIntersectsWith().stream()
-                        .anyMatch(conflictGroup -> trafficLights.getTrafficLights().get(conflictGroup) == TrafficlightState.groen);
+                        .anyMatch(conflictGroup -> trafficLights.getStoplichten().get(conflictGroup) == TrafficlightState.groen);
 
                 if(!conflict){
-                    trafficLights.getTrafficLights().put(groupKey, TrafficlightState.groen);
+                    trafficLights.getStoplichten().put(groupKey, TrafficlightState.groen);
                 }
             }
         }
 
-        zmqPublisher.sendMessage("stoplichten", trafficLightsJson(trafficLights.getTrafficLights()));
+        zmqPublisher.sendMessage("stoplichten", trafficLightsJson(trafficLights.getStoplichten()));
         start();
     }
 
@@ -152,8 +154,4 @@ public class TrafficlightController {
         }
         return objectMapper.writeValueAsString(trafficLightsMap);
     }
-
-
-
-
 }
