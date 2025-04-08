@@ -128,20 +128,6 @@ public class TrafficlightController {
         sendTrafficLightsToPublisher();
     }
 
-    private String trafficLightsJson(Dictionary<String, Trafficlight> trafficLights) throws JsonProcessingException {
-        Map<String, LightState> trafficLightsMap = new HashMap<>();
-
-        Enumeration<String> keys = trafficLights.keys();
-
-        //Change to spec standard
-        while (keys.hasMoreElements()) {
-            String key = keys.nextElement();
-            trafficLightsMap.put(key, trafficLights.get(key).getLightState());
-        }
-
-        return objectMapper.writeValueAsString(trafficLightsMap);
-    }
-
     private boolean hasConflict(IntersectionData.Group group) {
         return group.getIntersectsWith().stream()
                 .map(Object::toString)
@@ -156,8 +142,16 @@ public class TrafficlightController {
     }
 
     private void sendTrafficLightsToPublisher() throws JsonProcessingException {
-        String json = objectMapper.writeValueAsString(trafficLights);
+        Map<String, LightState> trafficLightsMap = new HashMap<>();
+
+        Enumeration<String> keys = trafficLights.getStoplichten().keys();
+
+        while (keys.hasMoreElements()) {
+            String key = keys.nextElement();
+            trafficLightsMap.put(key, trafficLights.getStoplichten().get(key).getLightState());
+        }
+
+        String json = objectMapper.writeValueAsString(trafficLightsMap);
         zmqPublisher.sendMessage("stoplichten", json);
     }
-
 }
