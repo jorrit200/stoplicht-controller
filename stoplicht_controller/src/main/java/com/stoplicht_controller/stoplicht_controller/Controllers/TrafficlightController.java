@@ -23,17 +23,15 @@ import java.util.Map;
 
 @Service
 public class TrafficlightController {
-    ObjectMapper objectMapper = new ObjectMapper();
-    IntersectionData intersectionData = JsonReader.getTrafficLightConfigFromSpec();
-    @Autowired
-    private JsonMessageReceiver jsonMessageReceiver;
-    @Autowired
-    private ZmqPublisher zmqPublisher;
-    @Autowired
-    private TrafficlightData trafficLights;
 
-    public TrafficlightController() {
-    }
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final IntersectionData intersectionData = JsonReader.getTrafficLightConfigFromSpec();
+
+    @Autowired private JsonMessageReceiver jsonMessageReceiver;
+    @Autowired private ZmqPublisher zmqPublisher;
+    @Autowired private TrafficlightData trafficLights;
+
+
 
     /// Orange implementeren, volgens nederlandse wet 3.5 seconden
     /// Cycle implementeren met puntensysteem
@@ -41,20 +39,21 @@ public class TrafficlightController {
     public void start() {
         while (true) {
             try {
-                //these might all break due to namechange Dutch -> English
+                //Topics
                 SensorLane sensorLane = jsonMessageReceiver.receiveMessage("sensoren_rijbaan", SensorLane.class);
                 Time time = jsonMessageReceiver.receiveMessage("tijd", Time.class);
                 PriorityVehicleQueue priorityVehicleQueue = jsonMessageReceiver.receiveMessage("voorrangsvoertuig", PriorityVehicleQueue.class);
                 SensorSpecial sensorSpecial = jsonMessageReceiver.receiveMessage("sensoren_speciaal", SensorSpecial.class);
 
+                //Cycles
                 if (!priorityVehicleQueue.getQueue().isEmpty()) {
                     processPriorityVehicle(priorityVehicleQueue);
                 }
 
-                //Cycles
-                startCycle(time, priorityVehicleQueue, sensorLane, sensorSpecial);
-                String trafficLightsJson = objectMapper.writeValueAsString(trafficLights);
-                zmqPublisher.sendMessage("stoplichten", trafficLightsJson);
+                executeTrafficCycle(time, priorityVehicleQueue, sensorLane, sensorSpecial);
+
+                //Send trafficlight
+                sendTrafficLightsToPublisher();
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -63,17 +62,13 @@ public class TrafficlightController {
         }
     }
 
-    public void startCycle(Time time, PriorityVehicleQueue priorityVehicleQueue, SensorLane sensorLane, SensorSpecial sensorSpecial) {
+    public void executeTrafficCycle(Time time, PriorityVehicleQueue priorityVehicleQueue, SensorLane sensorLane, SensorSpecial sensorSpecial) {
         for (Integer groupkey : intersectionData.getGroups().keySet()) {
+
             var group = intersectionData.getGroups().get(groupkey);
+            var conflict = hasConflict(group);
+            boolean requirementsMet = transitionAllowed(group, sensorSpecial, sensorLane, priorityVehicleQueue);
 
-            // 1. Conflictdetectie met Streams: Controleer of een conflicterende groep al op groen staat
-            var conflict = hasConflict(group, trafficLights);
-
-            // 2. Controleer of de transitievereisten zijn voldaan
-            boolean requirementsMet = checkTransitionRequirements(group, sensorSpecial, sensorLane, priorityVehicleQueue);
-
-            // 3. Als er geen conflicten zijn en de transitievereisten zijn voldaan, zet het verkeerslicht op groen
             if (!conflict && requirementsMet) {
                 updateTrafficLightState(groupkey.toString(), LightState.groen);
 
@@ -83,20 +78,21 @@ public class TrafficlightController {
         }
     }
 
-    private boolean checkTransitionRequirements(IntersectionData.Group group, SensorSpecial sensorSpecial, SensorLane sensorLane, PriorityVehicleQueue priorityVehicleQueue) {
+    private boolean transitionAllowed(IntersectionData.Group group, SensorSpecial sensorSpecial, SensorLane sensorLane, PriorityVehicleQueue priorityVehicleQueue) {
         // Als er geen transitievereisten zijn, is de overgang toegestaan
-        if (group.getTransitionRequirements() == null)
-            return true;
+        if (group.getTransitionRequirements() == null) return true;
 
         // Controleer alle vereisten met Streams
-        return group.getTransitionRequirements().getGreen().stream().allMatch(req -> {
-            if ("sensor".equals(req.getType())) {
-                boolean sensorValue = getSensorValue(req.getSensor(), sensorSpecial, sensorLane);
-                return sensorValue == req.getSensorState();
-            }
-            // Voeg hier extra voorwaarden toe indien nodig
-            return true;
-        });
+        return group.getTransitionRequirements().
+                getGreen()
+                .stream()
+                .allMatch(req -> {
+                    if ("sensor".equals(req.getType())) {
+                        boolean sensorValue = getSensorValue(req.getSensor(), sensorSpecial, sensorLane);
+                        return sensorValue == req.getSensorState();
+                    }
+                    return true;
+                });
     }
 
     public boolean getSensorValue(String sensorName, SensorSpecial sensorSpecial, SensorLane sensorLane) {
@@ -118,40 +114,35 @@ public class TrafficlightController {
     }
 
     public void processPriorityVehicle(PriorityVehicleQueue priorityVehicleQueue) throws JsonProcessingException {
-
         for (PriorityVehicleQueue.PriorityVehicle voertuig : priorityVehicleQueue.getQueue()) {
-            String laneId = voertuig.getLane();
-            //get groupKey
-            String groupKey = laneId;
+            String groupKey = voertuig.getLane();
             if (groupKey != null) {
                 var group = intersectionData.getGroups().get(groupKey);
-                var conflict = group.getIntersectsWith().stream()
-                        .anyMatch(conflictGroup -> trafficLights.getStoplichten().get(conflictGroup).getLightState() == LightState.groen);
+                var conflict = hasConflict(group);
 
                 if (!conflict) {
                     updateTrafficLightState(groupKey, LightState.groen);
                 }
             }
         }
-
-        zmqPublisher.sendMessage("stoplichten", trafficLightsJson(trafficLights.getStoplichten()));
-        start();
+        sendTrafficLightsToPublisher();
     }
 
-    //todo change dictionary to String and String
     private String trafficLightsJson(Dictionary<String, Trafficlight> trafficLights) throws JsonProcessingException {
         Map<String, LightState> trafficLightsMap = new HashMap<>();
 
         Enumeration<String> keys = trafficLights.keys();
 
+        //Change to spec standard
         while (keys.hasMoreElements()) {
-            String key = keys.nextElement(); // Key
-            trafficLightsMap.put(key, trafficLights.get(key).getLightState()); // Only use LightState
+            String key = keys.nextElement();
+            trafficLightsMap.put(key, trafficLights.get(key).getLightState());
         }
 
         return objectMapper.writeValueAsString(trafficLightsMap);
     }
-    private boolean hasConflict(IntersectionData.Group group, TrafficlightData trafficLights) {
+
+    private boolean hasConflict(IntersectionData.Group group) {
         return group.getIntersectsWith().stream()
                 .map(Object::toString)
                 .anyMatch(conflictGroup ->
@@ -163,4 +154,10 @@ public class TrafficlightController {
     private void updateTrafficLightState(String groupKey, LightState lightState) {
         trafficLights.getStoplichten().put(groupKey, new Trafficlight(lightState));
     }
+
+    private void sendTrafficLightsToPublisher() throws JsonProcessingException {
+        String json = objectMapper.writeValueAsString(trafficLights);
+        zmqPublisher.sendMessage("stoplichten", json);
+    }
+
 }
