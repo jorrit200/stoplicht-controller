@@ -3,10 +3,10 @@ package com.stoplicht_controller.stoplicht_controller.Controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stoplicht_controller.stoplicht_controller.Configurations.*;
-import com.stoplicht_controller.stoplicht_controller.Dtos.SensorenRijbaan;
-import com.stoplicht_controller.stoplicht_controller.Dtos.SensorenSpeciaal;
-import com.stoplicht_controller.stoplicht_controller.Dtos.Tijd;
-import com.stoplicht_controller.stoplicht_controller.Dtos.VoorrangsvoertuigRij;
+import com.stoplicht_controller.stoplicht_controller.Dtos.SensorLane;
+import com.stoplicht_controller.stoplicht_controller.Dtos.SensorSpecial;
+import com.stoplicht_controller.stoplicht_controller.Dtos.Time;
+import com.stoplicht_controller.stoplicht_controller.Dtos.PriorityVehicleQueue;
 import com.stoplicht_controller.stoplicht_controller.Enums.LightState;
 import com.stoplicht_controller.stoplicht_controller.Models.*;
 import com.stoplicht_controller.stoplicht_controller.messaging.JsonMessageReceiver;
@@ -27,7 +27,7 @@ public class TrafficlightController {
     @Autowired
     private ZmqPublisher zmqPublisher;
     @Autowired
-    private Stoplicht trafficLights;
+    private TrafficlightData trafficLights;
 
     ObjectMapper objectMapper = new ObjectMapper();
 
@@ -43,17 +43,18 @@ public class TrafficlightController {
         while(true){
             try {
                 System.out.println("Loop started in controller");
-                Tijd tijd = jsonMessageReceiver.receiveMessage("tijd", Tijd.class);
-                VoorrangsvoertuigRij voorrangsvoertuigRij = jsonMessageReceiver.receiveMessage("voorrangsvoertuig", VoorrangsvoertuigRij.class);
-                SensorenRijbaan sensorenRijbaan = jsonMessageReceiver.receiveMessage("sensoren_rijbaan", SensorenRijbaan.class);
-                SensorenSpeciaal sensorenSpeciaal = jsonMessageReceiver.receiveMessage("sensoren_speciaal", SensorenSpeciaal.class);
+                SensorLane sensorLane = jsonMessageReceiver.receiveMessage("sensoren_rijbaan", SensorLane.class);
 
-                if(!voorrangsvoertuigRij.getQueue().isEmpty())
+                Time time = jsonMessageReceiver.receiveMessage("tijd", Time.class);
+                PriorityVehicleQueue priorityVehicleQueue = jsonMessageReceiver.receiveMessage("voorrangsvoertuig", PriorityVehicleQueue.class);
+                SensorSpecial sensorSpecial = jsonMessageReceiver.receiveMessage("sensoren_speciaal", SensorSpecial.class);
+
+                if(!priorityVehicleQueue.getQueue().isEmpty())
                 {
-                    processPriorityVehicle(voorrangsvoertuigRij);
+                    processPriorityVehicle(priorityVehicleQueue);
                 }
                 //Cycles
-                startCycle(tijd, voorrangsvoertuigRij,sensorenRijbaan,sensorenSpeciaal);
+                startCycle(time, priorityVehicleQueue, sensorLane, sensorSpecial);
 
                 String trafficLightsJson = objectMapper.writeValueAsString(trafficLights);
                 System.out.println("about to send message");
@@ -67,7 +68,7 @@ public class TrafficlightController {
         }
     }
 
-    public void startCycle(Tijd tijd, VoorrangsvoertuigRij voorrangsvoertuigRij, SensorenRijbaan sensorenRijbaan, SensorenSpeciaal sensorenSpeciaal) {
+    public void startCycle(Time time, PriorityVehicleQueue priorityVehicleQueue, SensorLane sensorLane, SensorSpecial sensorSpecial) {
 
         // Loop over alle verkeerslichtgroepen
         for(Integer groupkey : intersectionData.getGroups().keySet()){
@@ -81,18 +82,18 @@ public class TrafficlightController {
                             //getStoplichten().get(conflictGroup) == LightState.groen);
 
             // 2. Controleer of de transitievereisten zijn voldaan
-            boolean requirementsMet = checkTransitionRequirements(group, sensorenSpeciaal, sensorenRijbaan, voorrangsvoertuigRij);
+            boolean requirementsMet = checkTransitionRequirements(group, sensorSpecial, sensorLane, priorityVehicleQueue);
 
             // 3. Als er geen conflicten zijn en de transitievereisten zijn voldaan, zet het verkeerslicht op groen
             if (!conflict && requirementsMet) {
-                trafficLights.getStoplichten().put(groupkey.toString(), new TrafficLight(LightState.groen));
+                trafficLights.getStoplichten().put(groupkey.toString(), new Trafficlight(LightState.groen));
             } else {
-                trafficLights.getStoplichten().put(groupkey.toString(), new TrafficLight(LightState.rood));
+                trafficLights.getStoplichten().put(groupkey.toString(), new Trafficlight(LightState.rood));
             }
         }
     }
 
-    private boolean checkTransitionRequirements(IntersectionData.Group group, SensorenSpeciaal sensorenSpeciaal, SensorenRijbaan sensorenRijbaan, VoorrangsvoertuigRij voorrangsvoertuigRij) {
+    private boolean checkTransitionRequirements(IntersectionData.Group group, SensorSpecial sensorSpecial, SensorLane sensorLane, PriorityVehicleQueue priorityVehicleQueue) {
         // Als er geen transitievereisten zijn, is de overgang toegestaan
         if (group.getTransitionRequirements() == null)
             return true;
@@ -100,7 +101,7 @@ public class TrafficlightController {
         // Controleer alle vereisten met Streams
         return group.getTransitionRequirements().getGreen().stream().allMatch(req -> {
             if ("sensor".equals(req.getType())) {
-                boolean sensorValue = getSensorValue(req.getSensor(), sensorenSpeciaal, sensorenRijbaan);
+                boolean sensorValue = getSensorValue(req.getSensor(), sensorSpecial, sensorLane);
                 return sensorValue == req.getSensorState();
             }
             // Voeg hier extra voorwaarden toe indien nodig
@@ -108,16 +109,16 @@ public class TrafficlightController {
         });
     }
 
-    public boolean getSensorValue(String sensorName, SensorenSpeciaal sensorenSpeciaal, SensorenRijbaan sensorenRijbaan) {
+    public boolean getSensorValue(String sensorName, SensorSpecial sensorSpecial, SensorLane sensorLane) {
         switch (sensorName) {
             case "brug_wegdek":
-                return sensorenSpeciaal.isBrug_wegdek();
+                return sensorSpecial.isBrug_wegdek();
             case "brug_water":
-                return sensorenSpeciaal.isBrug_water();
+                return sensorSpecial.isBrug_water();
             case "brug_file":
-                return sensorenSpeciaal.isBrug_file();
+                return sensorSpecial.isBrug_file();
             default:
-                SensorenRijbaan.SensorStatus sensorStatus = sensorenRijbaan.getSensors().get(sensorName);
+                SensorLane.SensorStatus sensorStatus = sensorLane.getSensors().get(sensorName);
                 if (sensorStatus != null) {
                     // Hier kiezen we ervoor om de 'voor'-waarde terug te geven; pas dit aan indien nodig.
                     return sensorStatus.isVoor();
@@ -127,9 +128,9 @@ public class TrafficlightController {
         }
     }
 
-    public void processPriorityVehicle(VoorrangsvoertuigRij voorrangsvoertuigRij) throws JsonProcessingException {
+    public void processPriorityVehicle(PriorityVehicleQueue priorityVehicleQueue) throws JsonProcessingException {
 
-        for (VoorrangsvoertuigRij.Voorrangsvoertuig voertuig : voorrangsvoertuigRij.getQueue()){
+        for (PriorityVehicleQueue.Voorrangsvoertuig voertuig : priorityVehicleQueue.getQueue()){
             String laneId = voertuig.getBaan();
             //get groupKey
             String groupKey = laneId;
@@ -139,7 +140,7 @@ public class TrafficlightController {
                         .anyMatch(conflictGroup -> trafficLights.getStoplichten().get(conflictGroup).getLightState()  == LightState.groen);
 
                 if(!conflict){
-                    trafficLights.getStoplichten().put(groupKey, new TrafficLight(LightState.groen));
+                    trafficLights.getStoplichten().put(groupKey, new Trafficlight(LightState.groen));
                 }
             }
         }
@@ -149,9 +150,9 @@ public class TrafficlightController {
     }
 
     //todo check if its right
-    public String trafficLightsJson(Dictionary<String, TrafficLight> trafficLights) throws JsonProcessingException {
+    public String trafficLightsJson(Dictionary<String, Trafficlight> trafficLights) throws JsonProcessingException {
 
-        Map<String, TrafficLight> trafficLightsMap = new HashMap<>();
+        Map<String, Trafficlight> trafficLightsMap = new HashMap<>();
 
         Enumeration<String> keys = trafficLights.keys();
 

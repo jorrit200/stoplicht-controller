@@ -5,6 +5,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class Tijd {
+public class Time {
     private int ms;
 }

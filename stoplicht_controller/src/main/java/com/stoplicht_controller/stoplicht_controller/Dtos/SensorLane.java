@@ -10,7 +10,7 @@ import java.util.Map;
 @Getter
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SensorenRijbaan {
+public class SensorLane {
     public Map<String, SensorStatus> sensors;
 
     @Getter

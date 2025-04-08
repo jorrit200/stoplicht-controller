@@ -1,10 +1,10 @@
 package com.stoplicht_controller.stoplicht_controller.Configurations;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.stoplicht_controller.stoplicht_controller.Dtos.SensorenRijbaan;
-import com.stoplicht_controller.stoplicht_controller.Dtos.SensorenSpeciaal;
-import com.stoplicht_controller.stoplicht_controller.Dtos.Tijd;
-import com.stoplicht_controller.stoplicht_controller.Dtos.VoorrangsvoertuigRij;
+import com.stoplicht_controller.stoplicht_controller.Dtos.SensorLane;
+import com.stoplicht_controller.stoplicht_controller.Dtos.SensorSpecial;
+import com.stoplicht_controller.stoplicht_controller.Dtos.Time;
+import com.stoplicht_controller.stoplicht_controller.Dtos.PriorityVehicleQueue;
 import org.springframework.stereotype.Component;
 import org.zeromq.SocketType;
 import org.zeromq.ZContext;
@@ -37,41 +37,41 @@ public class TestPublisher {
 
     public void startLoop() {
         // Initialize SensorenRijbaan
-        SensorenRijbaan sensorRijbaan = new SensorenRijbaan();
-        Map<String, SensorenRijbaan.SensorStatus> sensors = new HashMap<>();
-        SensorenRijbaan.SensorStatus sensorStatus = sensorRijbaan.new SensorStatus();
+        SensorLane sensorRijbaan = new SensorLane();
+        Map<String, SensorLane.SensorStatus> sensors = new HashMap<>();
+        SensorLane.SensorStatus sensorStatus = sensorRijbaan.new SensorStatus();
         sensorStatus.setVoor(true);
         sensorStatus.setAchter(false);
         sensors.put("1.1", sensorStatus);
         sensorRijbaan.setSensors(sensors);
 
         // Initialize SensorenSpeciaal
-        SensorenSpeciaal sensorSpeciaal = new SensorenSpeciaal();
+        SensorSpecial sensorSpeciaal = new SensorSpecial();
         sensorSpeciaal.setBrug_wegdek(true);
         sensorSpeciaal.setBrug_water(false);
         sensorSpeciaal.setBrug_file(true);
 
         // Initialize Tijd
-        Tijd tijd = new Tijd();
-        tijd.setMs(500);
+        Time time = new Time();
+        time.setMs(500);
 
         // Initialize VoorrangsvoertuigRij
-        VoorrangsvoertuigRij voorrangsvoertuigRij = new VoorrangsvoertuigRij();
-        List<VoorrangsvoertuigRij.Voorrangsvoertuig> queue = new ArrayList<>();
-        VoorrangsvoertuigRij.Voorrangsvoertuig voertuig = voorrangsvoertuigRij.new Voorrangsvoertuig();
+        PriorityVehicleQueue priorityVehicleQueue = new PriorityVehicleQueue();
+        List<PriorityVehicleQueue.Voorrangsvoertuig> queue = new ArrayList<>();
+        PriorityVehicleQueue.Voorrangsvoertuig voertuig = priorityVehicleQueue.new Voorrangsvoertuig();
         voertuig.setBaan("baan1");
         voertuig.setSimulatie_tijd_ms(500);
         voertuig.setPositie(1);
         queue.add(voertuig);
-        voorrangsvoertuigRij.setQueue(queue);
+        priorityVehicleQueue.setQueue(queue);
 
         try {
-            String tijdMessage = objectMapper.writeValueAsString(tijd);
+            String tijdMessage = objectMapper.writeValueAsString(time);
             this.sendMessage("tijd", tijdMessage);
 
 
             // Send VoorrangsvoertuigRij
-            String voorrangsvoertuigRijMessage = objectMapper.writeValueAsString(voorrangsvoertuigRij);
+            String voorrangsvoertuigRijMessage = objectMapper.writeValueAsString(priorityVehicleQueue);
             this.sendMessage("voorrangsvoertuig", voorrangsvoertuigRijMessage);
 
 

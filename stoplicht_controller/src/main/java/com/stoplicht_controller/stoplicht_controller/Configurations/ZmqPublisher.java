@@ -28,4 +28,6 @@ public class ZmqPublisher {
     public void close() {
         this.publisherSocket.close();
     }
+
+
 }

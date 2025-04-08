@@ -6,10 +6,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class TrafficLight {
+public class Trafficlight {
     private int priority;
     private LightState lightState;
 
-    public TrafficLight(LightState lightState) {
+    public Trafficlight(LightState lightState) {
     }
 }

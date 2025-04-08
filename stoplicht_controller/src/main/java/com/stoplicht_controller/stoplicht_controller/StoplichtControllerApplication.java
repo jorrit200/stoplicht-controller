@@ -33,16 +33,16 @@ public class StoplichtControllerApplication {
     }
 
     public void publishTrafficLightState() {
-        executorService.submit(() -> {
-            while (true) {
-                testPublisher.startLoop();
-                try {
-                    Thread.sleep(200);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
+//        executorService.submit(() -> {
+//            while (true) {
+//                testPublisher.startLoop();
+//                try {
+//                    Thread.sleep(200);
+//                } catch (Exception e) {
+//                    throw new RuntimeException(e);
+//                }
+//            }
+//        });
 
         executorService.submit(() -> {
             while (true) {

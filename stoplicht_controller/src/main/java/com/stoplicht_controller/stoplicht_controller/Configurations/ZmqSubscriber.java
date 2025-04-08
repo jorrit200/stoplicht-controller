@@ -13,7 +13,7 @@ public class ZmqSubscriber {
     public ZmqSubscriber() {
         context = new ZContext();
         subscriber = context.createSocket(SocketType.SUB);
-        subscriber.connect("tcp://10.121.17.123:5558");
+        subscriber.connect("tcp://10.121.17.54:5557");
     }
 
     public String receiveMessage(String topic) {

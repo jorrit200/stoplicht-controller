@@ -8,7 +8,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class VoorrangsvoertuigRij {
+public class PriorityVehicleQueue {
     @JsonProperty("queue")
     private List<Voorrangsvoertuig> queue;
 

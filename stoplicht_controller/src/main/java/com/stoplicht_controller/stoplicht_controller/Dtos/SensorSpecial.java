@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class SensorenSpeciaal {
+public class SensorSpecial {
     private boolean brug_wegdek;
     private boolean brug_water;
     private boolean brug_file;

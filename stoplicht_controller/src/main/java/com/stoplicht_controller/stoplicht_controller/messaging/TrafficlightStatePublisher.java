@@ -1,10 +1,10 @@
 package com.stoplicht_controller.stoplicht_controller.messaging;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.stoplicht_controller.stoplicht_controller.Models.Stoplicht;
+import com.stoplicht_controller.stoplicht_controller.Models.TrafficlightData;
 import com.stoplicht_controller.stoplicht_controller.Configurations.ZmqPublisher;
 import com.stoplicht_controller.stoplicht_controller.Enums.LightState;
-import com.stoplicht_controller.stoplicht_controller.Models.TrafficLight;
+import com.stoplicht_controller.stoplicht_controller.Models.Trafficlight;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.stereotype.Service;
@@ -20,9 +20,9 @@ public class TrafficlightStatePublisher {
     @Autowired
     private ZmqPublisher publisher;
     @Autowired
-    private Stoplicht trafficLights;
+    private TrafficlightData trafficLights;
 
-    public TrafficlightStatePublisher(ZmqPublisher publisher, Stoplicht trafficLights) {
+    public TrafficlightStatePublisher(ZmqPublisher publisher, TrafficlightData trafficLights) {
         this.publisher = publisher;
         this.trafficLights = trafficLights;
     }
@@ -36,14 +36,14 @@ public class TrafficlightStatePublisher {
     }
 
 
-    public String fillTrafficLights(Stoplicht trafficlight) throws JSONException {
+    public String fillTrafficLights(TrafficlightData trafficlight) throws JSONException {
         try {
-            Dictionary<String, TrafficLight> result =  new Hashtable<String, TrafficLight>();
-            result.put("1.1", new TrafficLight(LightState.groen));
-            result.put("2.1", new TrafficLight(LightState.groen));
-            result.put("3.1", new TrafficLight(LightState.groen));
-            result.put("4.1", new TrafficLight(LightState.groen));
-            result.put("5.1", new TrafficLight(LightState.groen));
+            Dictionary<String, Trafficlight> result =  new Hashtable<String, Trafficlight>();
+            result.put("1.1", new Trafficlight(LightState.groen));
+            result.put("2.1", new Trafficlight(LightState.groen));
+            result.put("3.1", new Trafficlight(LightState.groen));
+            result.put("4.1", new Trafficlight(LightState.groen));
+            result.put("5.1", new Trafficlight(LightState.groen));
 
             trafficlight.setStoplichten(result);
 
