@@ -19,7 +19,7 @@ import java.util.Map;
 public class TestPublisher {
     private final ZContext context;
     private final ZMQ.Socket publisherSocket;
-    private final String adress = "tcp://*:5558";
+    private final String adress = "tcp://10.121.17.123:5558";
     private ObjectMapper objectMapper = new ObjectMapper();
 
     public TestPublisher() {
@@ -32,7 +32,7 @@ public class TestPublisher {
     public void sendMessage(String topic, String message) {
         this.publisherSocket.sendMore(topic.getBytes());
         this.publisherSocket.send(message.getBytes(ZMQ.CHARSET), 0);
-        System.out.println("Sent: " + message);
+        //System.out.println("Sent: " + message);
     }
 
     public void startLoop() {
@@ -66,21 +66,23 @@ public class TestPublisher {
         voorrangsvoertuigRij.setQueue(queue);
 
         try {
-            // Send SensorenRijbaan
-            String sensorRijbaanMessage = objectMapper.writeValueAsString(sensorRijbaan);
-            this.sendMessage("SensorenRijbaan", sensorRijbaanMessage);
-
-            // Send SensorenSpeciaal
-            String sensorSpeciaalMessage = objectMapper.writeValueAsString(sensorSpeciaal);
-            this.sendMessage("SensorenSpeciaal", sensorSpeciaalMessage);
-
-            // Send Tijd
             String tijdMessage = objectMapper.writeValueAsString(tijd);
-            this.sendMessage("Tijd", tijdMessage);
+            this.sendMessage("tijd", tijdMessage);
+
 
             // Send VoorrangsvoertuigRij
             String voorrangsvoertuigRijMessage = objectMapper.writeValueAsString(voorrangsvoertuigRij);
-            this.sendMessage("VoorrangsvoertuigRij", voorrangsvoertuigRijMessage);
+            this.sendMessage("voorrangsvoertuig", voorrangsvoertuigRijMessage);
+
+
+            // Send SensorenRijbaan
+            String sensorRijbaanMessage = objectMapper.writeValueAsString(sensorRijbaan);
+            this.sendMessage("sensoren_rijbaan", sensorRijbaanMessage);
+
+            // Send SensorenSpeciaal
+            String sensorSpeciaalMessage = objectMapper.writeValueAsString(sensorSpeciaal);
+            this.sendMessage("sensoren_speciaal", sensorSpeciaalMessage);
+
 
 
         } catch (Exception e) {

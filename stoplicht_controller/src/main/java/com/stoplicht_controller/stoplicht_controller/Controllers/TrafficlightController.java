@@ -46,7 +46,7 @@ public class TrafficlightController {
                 Tijd tijd = jsonMessageReceiver.receiveMessage("tijd", Tijd.class);
                 VoorrangsvoertuigRij voorrangsvoertuigRij = jsonMessageReceiver.receiveMessage("voorrangsvoertuig", VoorrangsvoertuigRij.class);
                 SensorenRijbaan sensorenRijbaan = jsonMessageReceiver.receiveMessage("sensoren_rijbaan", SensorenRijbaan.class);
-                SensorenSpeciaal sensorenSpeciaal = jsonMessageReceiver.receiveMessage("sensorenSpeciaal", SensorenSpeciaal.class);
+                SensorenSpeciaal sensorenSpeciaal = jsonMessageReceiver.receiveMessage("sensoren_speciaal", SensorenSpeciaal.class);
 
                 if(!voorrangsvoertuigRij.getQueue().isEmpty())
                 {

@@ -1,15 +1,16 @@
 package com.stoplicht_controller.stoplicht_controller.Configurations;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 import org.zeromq.SocketType;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 
-@Configuration
+@Component
 public class ZmqPublisher {
     private final ZContext context;
     private final ZMQ.Socket publisherSocket;
-    private final String adress = "tcp://*:5556";
+    private final String adress = "tcp://10.121.17.123:5556";
 
     public ZmqPublisher() {
         this.context = new ZContext();
@@ -21,7 +22,7 @@ public class ZmqPublisher {
     public void sendMessage(String topic, String message) {
         this.publisherSocket.sendMore(topic.getBytes());
         this.publisherSocket.send(message.getBytes(ZMQ.CHARSET), 0);
-        System.out.println("Sent: " + message);
+        //System.out.println("Sent: " + message);
     }
 
     public void close() {

@@ -19,7 +19,11 @@ public class JsonMessageReceiver {
     public <T> T receiveMessage(String topic, Class<T> clazz) {
         try {
             String json = subscriber.receiveMessage(topic);
+            System.out.println(json);
             return mapper.readValue(json, clazz);
+
+
+
         } catch (Exception e) {
             System.err.println("Error receiving or parsing message: " + e.getMessage());
             e.printStackTrace();
