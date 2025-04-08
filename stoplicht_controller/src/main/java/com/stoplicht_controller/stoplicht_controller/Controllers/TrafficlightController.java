@@ -37,14 +37,12 @@ public class TrafficlightController {
 
 
     public void start() {
-        /// Puntensysteem, intersectie punten aftrek?
-        /// iets met een cyclus
-        ///  iets met tijd
+        /// Orange implementeren, volgens nederlandse wet 3.5 seconden
+        /// Cycle implementeren met puntensysteem
+        /// Tijd implementeren (in ms)
         while(true){
             try {
-                System.out.println("Loop started in controller");
                 SensorLane sensorLane = jsonMessageReceiver.receiveMessage("sensoren_rijbaan", SensorLane.class);
-
                 Time time = jsonMessageReceiver.receiveMessage("tijd", Time.class);
                 PriorityVehicleQueue priorityVehicleQueue = jsonMessageReceiver.receiveMessage("voorrangsvoertuig", PriorityVehicleQueue.class);
                 SensorSpecial sensorSpecial = jsonMessageReceiver.receiveMessage("sensoren_speciaal", SensorSpecial.class);
@@ -53,12 +51,11 @@ public class TrafficlightController {
                 {
                     processPriorityVehicle(priorityVehicleQueue);
                 }
+
                 //Cycles
                 startCycle(time, priorityVehicleQueue, sensorLane, sensorSpecial);
 
                 String trafficLightsJson = objectMapper.writeValueAsString(trafficLights);
-                System.out.println("about to send message");
-
                 zmqPublisher.sendMessage("stoplichten", trafficLightsJson );
 
             }catch (Exception e){
@@ -77,9 +74,7 @@ public class TrafficlightController {
             // 1. Conflictdetectie met Streams: Controleer of een conflicterende groep al op groen staat
             var conflict = group.getIntersectsWith().stream()
                     .map(Object::toString)
-                    //haal uit de trafficlights conflicterende groepen en check of ze groen zijn, trafficLights wordt constant geupdate in een loop dus dit gebeurt uiteindelijk
                     .anyMatch(conflictGroup-> trafficLights.getStoplichten().get(conflictGroup).getLightState() == LightState.groen);
-                            //getStoplichten().get(conflictGroup) == LightState.groen);
 
             // 2. Controleer of de transitievereisten zijn voldaan
             boolean requirementsMet = checkTransitionRequirements(group, sensorSpecial, sensorLane, priorityVehicleQueue);
@@ -149,8 +144,9 @@ public class TrafficlightController {
         start();
     }
 
-    //todo check if its right
+    //todo change dictionary to String and String
     public String trafficLightsJson(Dictionary<String, Trafficlight> trafficLights) throws JsonProcessingException {
+
 
         Map<String, Trafficlight> trafficLightsMap = new HashMap<>();
 

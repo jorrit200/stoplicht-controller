@@ -17,7 +17,6 @@ public class ZmqSubscriber {
     private final ZContext context;
     private final ZMQ.Socket subscriber;
     private final String address;
-    private ObjectMapper om = new ObjectMapper();
 
     public ZmqSubscriber() throws IOException {
         context = new ZContext();

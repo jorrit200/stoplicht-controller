@@ -12,8 +12,6 @@ import java.util.Hashtable;
 @Component
 public class TrafficlightData {
     private Dictionary<String, Trafficlight> stoplichten = new Hashtable<String, Trafficlight>();
-//make new object trafficlight met trafficlight state en prioritering
-
 
     public TrafficlightData() {}
 }
