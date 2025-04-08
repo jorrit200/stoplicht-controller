@@ -16,7 +16,6 @@ import com.stoplicht_controller.stoplicht_controller.messaging.JsonMessageReceiv
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -71,7 +70,6 @@ public class TrafficlightController {
 
             if (!conflict && requirementsMet) {
                 updateTrafficLightState(groupkey.toString(), LightState.groen);
-
             } else {
                 updateTrafficLightState(groupkey.toString(), LightState.rood);
             }
@@ -115,7 +113,7 @@ public class TrafficlightController {
 
     public void processPriorityVehicle(PriorityVehicleQueue priorityVehicleQueue) throws JsonProcessingException {
         for (PriorityVehicleQueue.PriorityVehicle voertuig : priorityVehicleQueue.getQueue()) {
-            String groupKey = voertuig.getLane();
+            var groupKey = voertuig.getLane();
             if (groupKey != null) {
                 var group = intersectionData.getGroups().get(groupKey);
                 var conflict = hasConflict(group);
