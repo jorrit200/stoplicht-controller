@@ -42,6 +42,7 @@ public class TrafficlightController {
         /// Tijd implementeren (in ms)
         while(true){
             try {
+                //these might all break due to namechange Dutch -> English
                 SensorLane sensorLane = jsonMessageReceiver.receiveMessage("sensoren_rijbaan", SensorLane.class);
                 Time time = jsonMessageReceiver.receiveMessage("tijd", Time.class);
                 PriorityVehicleQueue priorityVehicleQueue = jsonMessageReceiver.receiveMessage("voorrangsvoertuig", PriorityVehicleQueue.class);
@@ -107,16 +108,16 @@ public class TrafficlightController {
     public boolean getSensorValue(String sensorName, SensorSpecial sensorSpecial, SensorLane sensorLane) {
         switch (sensorName) {
             case "brug_wegdek":
-                return sensorSpecial.isBrug_wegdek();
+                return sensorSpecial.isBridge_road();
             case "brug_water":
-                return sensorSpecial.isBrug_water();
+                return sensorSpecial.isBridge_water();
             case "brug_file":
-                return sensorSpecial.isBrug_file();
+                return sensorSpecial.isBridge_traffic();
             default:
                 SensorLane.SensorStatus sensorStatus = sensorLane.getSensors().get(sensorName);
                 if (sensorStatus != null) {
                     // Hier kiezen we ervoor om de 'voor'-waarde terug te geven; pas dit aan indien nodig.
-                    return sensorStatus.isVoor();
+                    return sensorStatus.isFront();
                 } else {
                     throw new IllegalArgumentException("Sensor niet gevonden: " + sensorName);
                 }
@@ -125,8 +126,8 @@ public class TrafficlightController {
 
     public void processPriorityVehicle(PriorityVehicleQueue priorityVehicleQueue) throws JsonProcessingException {
 
-        for (PriorityVehicleQueue.Voorrangsvoertuig voertuig : priorityVehicleQueue.getQueue()){
-            String laneId = voertuig.getBaan();
+        for (PriorityVehicleQueue.PriorityVehicle voertuig : priorityVehicleQueue.getQueue()){
+            String laneId = voertuig.getLane();
             //get groupKey
             String groupKey = laneId;
             if(groupKey != null){

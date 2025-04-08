@@ -16,7 +16,7 @@ public class SensorLane {
     @Getter
     @Setter
     public class SensorStatus {
-        private boolean voor;
-        private boolean achter;
+        private boolean front;
+        private boolean back;
     }
 }
