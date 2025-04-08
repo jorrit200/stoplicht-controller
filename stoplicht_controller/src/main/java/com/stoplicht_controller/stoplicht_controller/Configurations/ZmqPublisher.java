@@ -6,7 +6,7 @@ import org.zeromq.SocketType;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 
-@Component
+@Configuration
 public class ZmqPublisher {
     private final ZContext context;
     private final ZMQ.Socket publisherSocket;
