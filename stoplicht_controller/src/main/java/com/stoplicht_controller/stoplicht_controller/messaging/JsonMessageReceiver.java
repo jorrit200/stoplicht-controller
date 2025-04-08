@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class JsonMessageReceiver {
+    @Autowired
     private final ZmqSubscriber subscriber;
     private final ObjectMapper mapper;
 
