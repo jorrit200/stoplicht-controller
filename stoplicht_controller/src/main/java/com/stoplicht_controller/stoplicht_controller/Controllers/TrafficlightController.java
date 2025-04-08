@@ -57,7 +57,7 @@ public class TrafficlightController {
 
     public void executeTrafficCycle(Time time, PriorityVehicleQueue priorityVehicleQueue, SensorLane sensorLane, SensorSpecial sensorSpecial) throws JsonProcessingException {
         if (!priorityVehicleQueue.getQueue().isEmpty()) {
-            processPriorityVehicle(priorityVehicleQueue);
+            processPriorityVehicle(priorityVehicleQueue, time);
         }
 
         for (Integer groupkey : intersectionData.getGroups().keySet()) {
@@ -67,9 +67,9 @@ public class TrafficlightController {
             boolean requirementsMet = transitionAllowed(group, sensorSpecial, sensorLane, priorityVehicleQueue);
 
             if (!conflict && requirementsMet) {
-                updateTrafficLightState(groupkey.toString(), LightState.groen);
+                updateTrafficLightState(groupkey.toString(), LightState.groen, time);
             } else {
-                updateTrafficLightState(groupkey.toString(), LightState.rood);
+                updateTrafficLightState(groupkey.toString(), LightState.oranje, time);
             }
         }
     }
@@ -109,7 +109,7 @@ public class TrafficlightController {
         }
     }
 
-    public void processPriorityVehicle(PriorityVehicleQueue priorityVehicleQueue) throws JsonProcessingException {
+    public void processPriorityVehicle(PriorityVehicleQueue priorityVehicleQueue, Time time) throws JsonProcessingException {
         for (PriorityVehicleQueue.PriorityVehicle voertuig : priorityVehicleQueue.getQueue()) {
             var groupKey = voertuig.getLane();
             if (groupKey != null) {
@@ -117,7 +117,7 @@ public class TrafficlightController {
                 var conflict = hasConflict(group);
 
                 if (!conflict) {
-                    updateTrafficLightState(groupKey, LightState.groen);
+                    updateTrafficLightState(groupKey, LightState.groen, time);
                 }
             }
         }
@@ -133,10 +133,19 @@ public class TrafficlightController {
                                 .getLightState() == LightState.groen);
     }
 
-    private void updateTrafficLightState(String groupKey, LightState lightState) {
-        trafficLights.getStoplichten().put(groupKey, new Trafficlight(lightState));
+    private void updateTrafficLightState(String groupKey, LightState lightState, Time time) {
+        Trafficlight currentTrafficlight = trafficLights.getStoplichten().get(groupKey);
+
+        if (currentTrafficlight != null
+                && currentTrafficlight.getLightState() == LightState.oranje
+                && (time.getMs() - currentTrafficlight.getMs()) >= 3500) {
+            trafficLights.getStoplichten().put(groupKey, new Trafficlight(LightState.rood, time.getMs()));
+        } else {
+            trafficLights.getStoplichten().put(groupKey, new Trafficlight(lightState, time.getMs()));
+        }
     }
 
+    //ja dit is beun
     private void sendTrafficLightsToPublisher() throws JsonProcessingException {
         Map<String, LightState> trafficLightsMap = new HashMap<>();
 

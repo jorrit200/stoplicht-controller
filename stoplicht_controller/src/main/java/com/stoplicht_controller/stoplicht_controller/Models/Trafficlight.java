@@ -9,7 +9,10 @@ import lombok.Setter;
 public class Trafficlight {
     private int priority;
     private LightState lightState;
+    private int ms;
 
     public Trafficlight(LightState lightState) {
+    }
+    public Trafficlight(LightState lightState, int ms) {
     }
 }
