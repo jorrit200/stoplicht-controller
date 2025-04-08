@@ -30,8 +30,6 @@ public class TrafficlightController {
     @Autowired private ZmqPublisher zmqPublisher;
     @Autowired private TrafficlightData trafficLights;
 
-
-
     /// Orange implementeren, volgens nederlandse wet 3.5 seconden
     /// Cycle implementeren met puntensysteem
     /// Tijd implementeren (in ms)
@@ -44,11 +42,7 @@ public class TrafficlightController {
                 PriorityVehicleQueue priorityVehicleQueue = jsonMessageReceiver.receiveMessage("voorrangsvoertuig", PriorityVehicleQueue.class);
                 SensorSpecial sensorSpecial = jsonMessageReceiver.receiveMessage("sensoren_speciaal", SensorSpecial.class);
 
-                //Cycles
-                if (!priorityVehicleQueue.getQueue().isEmpty()) {
-                    processPriorityVehicle(priorityVehicleQueue);
-                }
-
+                //Start
                 executeTrafficCycle(time, priorityVehicleQueue, sensorLane, sensorSpecial);
 
                 //Send trafficlight
@@ -61,7 +55,11 @@ public class TrafficlightController {
         }
     }
 
-    public void executeTrafficCycle(Time time, PriorityVehicleQueue priorityVehicleQueue, SensorLane sensorLane, SensorSpecial sensorSpecial) {
+    public void executeTrafficCycle(Time time, PriorityVehicleQueue priorityVehicleQueue, SensorLane sensorLane, SensorSpecial sensorSpecial) throws JsonProcessingException {
+        if (!priorityVehicleQueue.getQueue().isEmpty()) {
+            processPriorityVehicle(priorityVehicleQueue);
+        }
+
         for (Integer groupkey : intersectionData.getGroups().keySet()) {
 
             var group = intersectionData.getGroups().get(groupkey);
