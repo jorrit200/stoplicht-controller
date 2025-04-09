@@ -1,7 +1,6 @@
 package com.stoplicht_controller.stoplicht_controller;
 
 import com.stoplicht_controller.stoplicht_controller.Controllers.TrafficlightController;
-import com.stoplicht_controller.stoplicht_controller.messaging.TrafficlightStatePublisher;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -13,8 +12,7 @@ import java.util.concurrent.Executors;
 @SpringBootApplication
 public class StoplichtControllerApplication {
 
-    @Autowired
-    private TrafficlightStatePublisher trafficlightStatePublisher;
+
     @Autowired
     private TrafficlightController trafficlightController;
 
