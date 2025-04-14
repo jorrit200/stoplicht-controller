@@ -2,6 +2,8 @@ package com.stoplicht_controller.stoplicht_controller.messaging;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stoplicht_controller.stoplicht_controller.Configurations.ZmqSubscriber;
+import com.stoplicht_controller.stoplicht_controller.Dtos.PriorityVehicleQueue;
+import com.stoplicht_controller.stoplicht_controller.Dtos.SensorLane;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,13 +23,11 @@ public class JsonMessageReceiver {
         try {
             String json = subscriber.receiveMessage(topic);
             System.out.println(json);
+
             return mapper.readValue(json, clazz);
-
-
-
         } catch (Exception e) {
             System.err.println("Error receiving or parsing message: " + e.getMessage());
-            e.printStackTrace();
+            //e.printStackTrace();
             return receiveMessage(topic, clazz);
         }
     }

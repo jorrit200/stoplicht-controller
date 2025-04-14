@@ -26,6 +26,7 @@ public class TrafficlightController {
 
     @Autowired
     private ZmqPublisher zmqPublisher;
+
     @Autowired
     private TrafficlightData trafficLights;
 
@@ -40,16 +41,15 @@ public class TrafficlightController {
         /// Puntensysteem, intersectie punten aftrek?
         /// iets met een cyclus
         ///  iets met tijd
+        System.out.println("Loop started in controller");
         while(true){
             try {
-                System.out.println("Loop started in controller");
                 SensorLane sensorLane = jsonMessageReceiver.receiveMessage("sensoren_rijbaan", SensorLane.class);
-
                 Time time = jsonMessageReceiver.receiveMessage("tijd", Time.class);
                 PriorityVehicleQueue priorityVehicleQueue = jsonMessageReceiver.receiveMessage("voorrangsvoertuig", PriorityVehicleQueue.class);
                 SensorSpecial sensorSpecial = jsonMessageReceiver.receiveMessage("sensoren_speciaal", SensorSpecial.class);
 
-                if(!priorityVehicleQueue.getQueue().isEmpty())
+                if(priorityVehicleQueue.getQueue() != null)
                 {
                     processPriorityVehicle(priorityVehicleQueue);
                 }
@@ -133,14 +133,15 @@ public class TrafficlightController {
         for (PriorityVehicleQueue.Voorrangsvoertuig voertuig : priorityVehicleQueue.getQueue()){
             String laneId = voertuig.getBaan();
             //get groupKey
-            String groupKey = laneId;
-            if(groupKey != null){
-                var group = intersectionData.getGroups().get(groupKey);
+            Integer groupKey = Integer.parseInt(laneId.split("\\.")[0]);
+            if(groupKey != 0){
+                var groups = intersectionData.getGroups();
+                var group = groups.get(groupKey);
                 var conflict = group.getIntersectsWith().stream()
                         .anyMatch(conflictGroup -> trafficLights.getStoplichten().get(conflictGroup).getLightState()  == LightState.groen);
 
                 if(!conflict){
-                    trafficLights.getStoplichten().put(groupKey, new Trafficlight(LightState.groen));
+                    trafficLights.getStoplichten().put(laneId, new Trafficlight(LightState.groen));
                 }
             }
         }

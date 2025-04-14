@@ -1,5 +1,6 @@
 package com.stoplicht_controller.stoplicht_controller;
 
+import com.stoplicht_controller.stoplicht_controller.Configurations.TestPublisher;
 import com.stoplicht_controller.stoplicht_controller.Controllers.TrafficlightController;
 import com.stoplicht_controller.stoplicht_controller.messaging.TrafficlightStatePublisher;
 import jakarta.annotation.PostConstruct;
@@ -17,6 +18,10 @@ public class StoplichtControllerApplication {
     private TrafficlightStatePublisher trafficlightStatePublisher;
     @Autowired
     private TrafficlightController trafficlightController;
+    @Autowired
+    private TestPublisher testPublisher;
+
+    private final ExecutorService executor = Executors.newFixedThreadPool(2);
 
     public static void main(String[] args) {
         SpringApplication.run(StoplichtControllerApplication.class, args);
@@ -24,6 +29,13 @@ public class StoplichtControllerApplication {
 
     @PostConstruct
     public void init() {
-        trafficlightController.start();
+        executor.submit(() -> trafficlightController.start());
+        executor.submit(() -> {
+            try {
+                testPublisher.startLoop();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 }

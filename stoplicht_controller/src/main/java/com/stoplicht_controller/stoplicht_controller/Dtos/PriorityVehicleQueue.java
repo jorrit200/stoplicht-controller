@@ -14,7 +14,7 @@ public class PriorityVehicleQueue {
 
     @Getter
     @Setter
-    public class Voorrangsvoertuig {
+    public static class Voorrangsvoertuig {
         private String baan;
         private int simulatie_tijd_ms;
         private int positie;
