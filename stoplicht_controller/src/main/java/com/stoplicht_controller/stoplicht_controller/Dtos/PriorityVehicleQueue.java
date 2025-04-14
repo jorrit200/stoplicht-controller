@@ -13,7 +13,7 @@ public class PriorityVehicleQueue {
 
     @Getter
     @Setter
-    public class PriorityVehicle {
+    public static class PriorityVehicle {
         @JsonProperty("baan")
         private String lane;
         @JsonProperty("simulatie_tijd_ms")

@@ -42,7 +42,6 @@ public class ZmqSubscriber {
     public String receiveMessage(String topic) {
         subscriber.subscribe(topic.getBytes(ZMQ.CHARSET));
 
-        System.out.println("Subscribed to topic: " + topic);
         String tp = subscriber.recvStr().trim();
         String contents = subscriber.recvStr().trim();
         System.out.println("Received: [" + topic + "] " + contents);

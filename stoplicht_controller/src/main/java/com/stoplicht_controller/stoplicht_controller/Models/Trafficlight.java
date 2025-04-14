@@ -1,5 +1,6 @@
 package com.stoplicht_controller.stoplicht_controller.Models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.stoplicht_controller.stoplicht_controller.Enums.LightState;
 import lombok.Getter;
 import lombok.Setter;
@@ -7,12 +8,15 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Trafficlight {
+    @JsonIgnore
     private int priority;
     private LightState lightState;
+    private String LightId;
+    @JsonIgnore
     private int ms;
 
-    public Trafficlight(LightState lightState) {
-    }
+    public Trafficlight(){}
+
     public Trafficlight(LightState lightState, int ms) {
     }
 }

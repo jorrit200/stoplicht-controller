@@ -16,7 +16,6 @@ import com.stoplicht_controller.stoplicht_controller.messaging.JsonMessageReceiv
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -96,11 +95,11 @@ public class TrafficlightController {
 
     public boolean getSensorValue(String sensorName, SensorSpecial sensorSpecial, SensorLane sensorLane) {
         switch (sensorName) {
-            case "bridge_road":
+            case "brug_wegdek":
                 return sensorSpecial.isBridge_road();
-            case "bridge_water":
+            case "brug_water":
                 return sensorSpecial.isBridge_water();
-            case "bridge_traffic":
+            case "brug_file":
                 return sensorSpecial.isBridge_traffic();
             default:
                 SensorLane.SensorStatus sensorStatus = sensorLane.getSensors().get(sensorName);
@@ -114,13 +113,14 @@ public class TrafficlightController {
 
     public void processPriorityVehicle(PriorityVehicleQueue priorityVehicleQueue, Time time) throws JsonProcessingException {
         for (PriorityVehicleQueue.PriorityVehicle voertuig : priorityVehicleQueue.getQueue()) {
-            var groupKey = voertuig.getLane();
-            if (groupKey != null) {
+            var groupLane = voertuig.getLane();
+            var groupKey = Integer.parseInt(groupLane.split("\\.")[0]);
+            if (groupKey != 0) {
                 var group = intersectionData.getGroups().get(groupKey);
                 var conflict = hasConflict(group);
 
                 if (!conflict) {
-                    updateTrafficLightState(groupKey, LightState.groen, time);
+                    updateTrafficLightState(groupLane, LightState.groen, time);
                 }
             }
         }
@@ -143,23 +143,21 @@ public class TrafficlightController {
                 && currentTrafficlight.getLightState() == LightState.oranje
                 && (time.getMs() - currentTrafficlight.getMs()) >= 3500) {
             trafficLights.getStoplichten().put(groupKey, new Trafficlight(LightState.rood, time.getMs()));
-        } else {
-            trafficLights.getStoplichten().put(groupKey, new Trafficlight(lightState, time.getMs()));
         }
     }
 
     //ja dit is beun
     private void sendTrafficLightsToPublisher() throws JsonProcessingException {
-        Map<String, LightState> trafficLightsMap = new HashMap<>();
+        Map<String, String> simplifiedMap = new HashMap<>();
 
-        Enumeration<String> keys = trafficLights.getStoplichten().keys();
+        trafficLights.getStoplichten().elements().asIterator().forEachRemaining(tl -> {
+            simplifiedMap.put(tl.getLightId(), tl.getLightState().toString());
+        });
 
-        while (keys.hasMoreElements()) {
-            String key = keys.nextElement();
-            trafficLightsMap.put(key, trafficLights.getStoplichten().get(key).getLightState());
-        }
+        String json = objectMapper.writeValueAsString(simplifiedMap);
 
-        String json = objectMapper.writeValueAsString(trafficLightsMap);
+        System.out.println("Sent: [" + "stoplichten" + "] " + json);
+
         zmqPublisher.sendMessage("stoplichten", json);
     }
 }

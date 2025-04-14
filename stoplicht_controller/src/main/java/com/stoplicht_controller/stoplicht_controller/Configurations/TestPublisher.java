@@ -42,7 +42,7 @@ public class TestPublisher {
             // Initialize SensorenRijbaan
             SensorLane sensorRijbaan = new SensorLane();
             Map<String, SensorLane.SensorStatus> sensors = new HashMap<>();
-            SensorLane.SensorStatus sensorStatus = sensorRijbaan.new SensorStatus();
+            SensorLane.SensorStatus sensorStatus = new SensorLane.SensorStatus();
             sensorStatus.setFront(true);
             sensorStatus.setBack(false);
             sensors.put("1.1", sensorStatus);
@@ -61,7 +61,7 @@ public class TestPublisher {
             // Initialize VoorrangsvoertuigRij
             PriorityVehicleQueue priorityVehicleQueue = new PriorityVehicleQueue();
             List<PriorityVehicleQueue.PriorityVehicle> queue = new ArrayList<>();
-            PriorityVehicleQueue.PriorityVehicle voertuig = priorityVehicleQueue.new PriorityVehicle();
+            PriorityVehicleQueue.PriorityVehicle voertuig = new PriorityVehicleQueue.PriorityVehicle();
             voertuig.setLane("8.1");
             voertuig.setSimulation_time_ms(500);
             voertuig.setPriority(1);

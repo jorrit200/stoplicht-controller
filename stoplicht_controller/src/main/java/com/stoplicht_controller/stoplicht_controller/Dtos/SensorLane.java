@@ -15,7 +15,7 @@ public class SensorLane {
 
     @Getter
     @Setter
-    public class SensorStatus {
+    public static class SensorStatus {
         @JsonProperty("voor")
         private boolean front;
         @JsonProperty("achter")
