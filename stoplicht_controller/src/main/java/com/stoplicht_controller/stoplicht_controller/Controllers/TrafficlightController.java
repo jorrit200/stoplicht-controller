@@ -16,8 +16,10 @@ import com.stoplicht_controller.stoplicht_controller.messaging.JsonMessageReceiv
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Queue;
 
 @Service
 public class TrafficlightController {
@@ -32,6 +34,8 @@ public class TrafficlightController {
     @Autowired private JsonMessageReceiver jsonMessageReceiver;
     @Autowired private ZmqPublisher zmqPublisher;
 
+    private PriorityVehicleQueue priorityVehicleQueue = new PriorityVehicleQueue();
+
     /// Orange implementeren, volgens nederlandse wet 3.5 seconden
     /// Cycle implementeren met puntensysteem
     /// Tijd implementeren (in ms)
@@ -41,8 +45,12 @@ public class TrafficlightController {
                 //Topics
                 SensorLane sensorLane = jsonMessageReceiver.receiveMessage("sensoren_rijbaan", SensorLane.class);
                 Time time = jsonMessageReceiver.receiveMessage("tijd", Time.class);
-                PriorityVehicleQueue priorityVehicleQueue = jsonMessageReceiver.receiveMessage("voorrangsvoertuig", PriorityVehicleQueue.class);
+                priorityVehicleQueue = jsonMessageReceiver.receiveMessage("voorrangsvoertuig", PriorityVehicleQueue.class);
                 SensorSpecial sensorSpecial = jsonMessageReceiver.receiveMessage("sensoren_speciaal", SensorSpecial.class);
+
+                if (priorityVehicleQueue == null || priorityVehicleQueue.getQueue() == null){
+                    priorityVehicleQueue.setQueue(new ArrayList<>());
+                }
 
                 //Start
                 executeTrafficCycle(time, priorityVehicleQueue, sensorLane, sensorSpecial);

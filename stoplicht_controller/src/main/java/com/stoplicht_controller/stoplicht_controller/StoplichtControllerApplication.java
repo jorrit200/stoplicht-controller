@@ -26,12 +26,12 @@ public class StoplichtControllerApplication {
     @PostConstruct
     public void init() {
         executor.submit(() -> trafficlightController.start());
-        executor.submit(() -> {
-            try {
-                testPublisher.startLoop();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+//        executor.submit(() -> {
+//            try {
+//                testPublisher.startLoop();
+//            } catch (Exception e) {
+//                throw new RuntimeException(e);
+//            }
+//        });
     }
 }
