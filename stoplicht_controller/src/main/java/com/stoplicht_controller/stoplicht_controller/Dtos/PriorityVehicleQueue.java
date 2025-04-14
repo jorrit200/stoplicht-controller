@@ -1,5 +1,6 @@
 package com.stoplicht_controller.stoplicht_controller.Dtos;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,8 +14,11 @@ public class PriorityVehicleQueue {
     @Getter
     @Setter
     public class PriorityVehicle {
+        @JsonProperty("baan")
         private String lane;
+        @JsonProperty("simulatie_tijd_ms")
         private int simulation_time_ms;
-        private int position;
+        @JsonProperty("prioriteit")
+        private int priority;
     }
 }

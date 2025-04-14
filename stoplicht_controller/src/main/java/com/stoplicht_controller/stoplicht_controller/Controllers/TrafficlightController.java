@@ -39,11 +39,11 @@ public class TrafficlightController {
                 //Topics
                 SensorLane sensorLane = jsonMessageReceiver.receiveMessage("sensoren_rijbaan", SensorLane.class);
                 Time time = jsonMessageReceiver.receiveMessage("tijd", Time.class);
-                PriorityVehicleQueue priorityVehicleQueue = jsonMessageReceiver.receiveMessage("voorrangsvoertuig", PriorityVehicleQueue.class);
+                //PriorityVehicleQueue priorityVehicleQueue = jsonMessageReceiver.receiveMessage("voorrangsvoertuig", PriorityVehicleQueue.class);
                 SensorSpecial sensorSpecial = jsonMessageReceiver.receiveMessage("sensoren_speciaal", SensorSpecial.class);
 
                 //Start
-                executeTrafficCycle(time, priorityVehicleQueue, sensorLane, sensorSpecial);
+                executeTrafficCycle(time,  sensorLane, sensorSpecial);
 
                 //Send trafficlight
                 sendTrafficLightsToPublisher();
@@ -55,16 +55,16 @@ public class TrafficlightController {
         }
     }
 
-    public void executeTrafficCycle(Time time, PriorityVehicleQueue priorityVehicleQueue, SensorLane sensorLane, SensorSpecial sensorSpecial) throws JsonProcessingException {
-        if (!priorityVehicleQueue.getQueue().isEmpty()) {
-            processPriorityVehicle(priorityVehicleQueue, time);
-        }
+    public void executeTrafficCycle(Time time, SensorLane sensorLane, SensorSpecial sensorSpecial) throws JsonProcessingException {
+//        if (!priorityVehicleQueue.getQueue().isEmpty()) {
+//            processPriorityVehicle(priorityVehicleQueue, time);
+//        }
 
         for (Integer groupkey : intersectionData.getGroups().keySet()) {
 
             var group = intersectionData.getGroups().get(groupkey);
             var conflict = hasConflict(group);
-            boolean requirementsMet = transitionAllowed(group, sensorSpecial, sensorLane, priorityVehicleQueue);
+            boolean requirementsMet = transitionAllowed(group, sensorSpecial, sensorLane);
 
             if (!conflict && requirementsMet) {
                 updateTrafficLightState(groupkey.toString(), LightState.groen, time);
@@ -74,7 +74,7 @@ public class TrafficlightController {
         }
     }
 
-    private boolean transitionAllowed(IntersectionData.Group group, SensorSpecial sensorSpecial, SensorLane sensorLane, PriorityVehicleQueue priorityVehicleQueue) {
+    private boolean transitionAllowed(IntersectionData.Group group, SensorSpecial sensorSpecial, SensorLane sensorLane) {
         // Als er geen transitievereisten zijn, is de overgang toegestaan
         if (group.getTransitionRequirements() == null) return true;
 
