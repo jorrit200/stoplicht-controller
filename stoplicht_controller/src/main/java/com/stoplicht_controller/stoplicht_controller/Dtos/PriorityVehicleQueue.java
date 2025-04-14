@@ -9,14 +9,16 @@ import java.util.List;
 @Getter
 @Setter
 public class PriorityVehicleQueue {
-    @JsonProperty("queue")
-    private List<Voorrangsvoertuig> queue;
+    private List<PriorityVehicle> queue;
 
     @Getter
     @Setter
-    public static class Voorrangsvoertuig {
-        private String baan;
-        private int simulatie_tijd_ms;
-        private int positie;
+    public class PriorityVehicle {
+        @JsonProperty("baan")
+        private String lane;
+        @JsonProperty("simulatie_tijd_ms")
+        private int simulation_time_ms;
+        @JsonProperty("prioriteit")
+        private int priority;
     }
 }

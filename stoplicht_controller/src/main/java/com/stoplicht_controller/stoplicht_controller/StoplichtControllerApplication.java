@@ -13,9 +13,6 @@ import java.util.concurrent.Executors;
 
 @SpringBootApplication
 public class StoplichtControllerApplication {
-
-    @Autowired
-    private TrafficlightStatePublisher trafficlightStatePublisher;
     @Autowired
     private TrafficlightController trafficlightController;
     @Autowired
