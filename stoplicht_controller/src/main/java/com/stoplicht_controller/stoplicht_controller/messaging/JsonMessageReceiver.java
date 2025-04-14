@@ -26,10 +26,6 @@ public class JsonMessageReceiver {
         } catch (Exception e) {
             System.err.println("Error receiving or parsing message: " + e.getMessage());
             //e.printStackTrace();
-            return mapper.readValue(json, clazz);
-        } catch (Exception e) {
-            System.err.println("Error receiving or parsing message: " + e.getMessage());
-            e.printStackTrace();
             return receiveMessage(topic, clazz);
         }
     }

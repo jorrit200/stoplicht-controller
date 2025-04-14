@@ -32,7 +32,6 @@ public class TrafficlightController {
 
     @Autowired private JsonMessageReceiver jsonMessageReceiver;
     @Autowired private ZmqPublisher zmqPublisher;
-    @Autowired private TrafficlightData trafficLights;
 
     /// Orange implementeren, volgens nederlandse wet 3.5 seconden
     /// Cycle implementeren met puntensysteem
@@ -43,11 +42,11 @@ public class TrafficlightController {
                 //Topics
                 SensorLane sensorLane = jsonMessageReceiver.receiveMessage("sensoren_rijbaan", SensorLane.class);
                 Time time = jsonMessageReceiver.receiveMessage("tijd", Time.class);
-                //PriorityVehicleQueue priorityVehicleQueue = jsonMessageReceiver.receiveMessage("voorrangsvoertuig", PriorityVehicleQueue.class);
+                PriorityVehicleQueue priorityVehicleQueue = jsonMessageReceiver.receiveMessage("voorrangsvoertuig", PriorityVehicleQueue.class);
                 SensorSpecial sensorSpecial = jsonMessageReceiver.receiveMessage("sensoren_speciaal", SensorSpecial.class);
 
                 //Start
-                executeTrafficCycle(time,  sensorLane, sensorSpecial);
+                executeTrafficCycle(time, priorityVehicleQueue, sensorLane, sensorSpecial);
 
                 //Send trafficlight
                 sendTrafficLightsToPublisher();
@@ -59,10 +58,10 @@ public class TrafficlightController {
         }
     }
 
-    public void executeTrafficCycle(Time time, SensorLane sensorLane, SensorSpecial sensorSpecial) throws JsonProcessingException {
-//        if (!priorityVehicleQueue.getQueue().isEmpty()) {
-//            processPriorityVehicle(priorityVehicleQueue, time);
-//        }
+    public void executeTrafficCycle(Time time, PriorityVehicleQueue priorityVehicleQueue, SensorLane sensorLane, SensorSpecial sensorSpecial) throws JsonProcessingException {
+        if (!priorityVehicleQueue.getQueue().isEmpty()) {
+            processPriorityVehicle(priorityVehicleQueue, time);
+        }
 
         for (Integer groupkey : intersectionData.getGroups().keySet()) {
 

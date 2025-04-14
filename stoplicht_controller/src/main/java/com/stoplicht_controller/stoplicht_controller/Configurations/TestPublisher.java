@@ -42,17 +42,17 @@ public class TestPublisher {
             // Initialize SensorenRijbaan
             SensorLane sensorRijbaan = new SensorLane();
             Map<String, SensorLane.SensorStatus> sensors = new HashMap<>();
-            SensorLane.SensorStatus sensorStatus = new SensorLane.SensorStatus();
-            sensorStatus.setVoor(true);
-            sensorStatus.setAchter(false);
+            SensorLane.SensorStatus sensorStatus = sensorRijbaan.new SensorStatus();
+            sensorStatus.setFront(true);
+            sensorStatus.setBack(false);
             sensors.put("1.1", sensorStatus);
             sensorRijbaan.setSensors(sensors);
 
             // Initialize SensorenSpeciaal
             SensorSpecial sensorSpeciaal = new SensorSpecial();
-            sensorSpeciaal.setBrug_wegdek(true);
-            sensorSpeciaal.setBrug_water(false);
-            sensorSpeciaal.setBrug_file(true);
+            sensorSpeciaal.setBridge_road(true);
+            sensorSpeciaal.setBridge_water(false);
+            sensorSpeciaal.setBridge_traffic(true);
 
             // Initialize Tijd
             Time time = new Time();
@@ -60,11 +60,11 @@ public class TestPublisher {
 
             // Initialize VoorrangsvoertuigRij
             PriorityVehicleQueue priorityVehicleQueue = new PriorityVehicleQueue();
-            List<PriorityVehicleQueue.Voorrangsvoertuig> queue = new ArrayList<>();
-            PriorityVehicleQueue.Voorrangsvoertuig voertuig = new PriorityVehicleQueue.Voorrangsvoertuig();
-            voertuig.setBaan("8.1");
-            voertuig.setSimulatie_tijd_ms(500);
-            voertuig.setPositie(1);
+            List<PriorityVehicleQueue.PriorityVehicle> queue = new ArrayList<>();
+            PriorityVehicleQueue.PriorityVehicle voertuig = priorityVehicleQueue.new PriorityVehicle();
+            voertuig.setLane("8.1");
+            voertuig.setSimulation_time_ms(500);
+            voertuig.setPriority(1);
             queue.add(voertuig);
             priorityVehicleQueue.setQueue(queue);
 

@@ -2,7 +2,6 @@ package com.stoplicht_controller.stoplicht_controller;
 
 import com.stoplicht_controller.stoplicht_controller.Configurations.TestPublisher;
 import com.stoplicht_controller.stoplicht_controller.Controllers.TrafficlightController;
-import com.stoplicht_controller.stoplicht_controller.messaging.TrafficlightStatePublisher;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
