@@ -7,7 +7,9 @@ import org.zeromq.SocketType;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
@@ -19,12 +21,12 @@ public class ZmqSubscriber {
     private final String address;
     private ObjectMapper om = new ObjectMapper();
 
-    public ZmqSubscriber() throws IOException {
+    public ZmqSubscriber() throws IOException, URISyntaxException {
         context = new ZContext();
         subscriber = context.createSocket(SocketType.SUB);
 
         // Read the JSON file
-        String json = Files.readString(Path.of("src/main/resources/configuration-format.json"));
+        String json = Files.readString(Path.of(getClass().getResource("/configuration-format.json").toURI()));
 
         // Create ObjectMapper to map the JSON
         ObjectMapper mapper = new ObjectMapper();
@@ -35,6 +37,7 @@ public class ZmqSubscriber {
 
         // Define the address to connect to
         this.address = "tcp://" + controller.get("host") + ":" + controller.get("port");
+        System.out.println(address);
 
         subscriber.connect(this.address);
     }

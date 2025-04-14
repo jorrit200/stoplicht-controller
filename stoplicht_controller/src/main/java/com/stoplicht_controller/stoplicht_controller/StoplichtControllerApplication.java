@@ -14,8 +14,6 @@ import java.util.concurrent.Executors;
 public class StoplichtControllerApplication {
     @Autowired
     private TrafficlightController trafficlightController;
-    @Autowired
-    private TestPublisher testPublisher;
 
     private final ExecutorService executor = Executors.newFixedThreadPool(2);
 
