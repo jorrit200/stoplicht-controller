@@ -7,30 +7,50 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 
-import java.util.Dictionary;
-import java.util.Hashtable;
-import java.util.Map;
+import java.util.*;
 
 @Getter
 @Setter
 @Component
 public class TrafficlightData {
-    private Dictionary<String, Trafficlight> stoplichten = new Hashtable<String, Trafficlight>();
+    private Dictionary<String, List<Trafficlight>> stoplichten = new Hashtable<>();
     @JsonIgnore
     private final IntersectionData intersectionData = JsonReader.getTrafficLightConfigFromSpec();
 
     public TrafficlightData() {
+        // Loop through groups
         intersectionData.getGroups().forEach((groupKey, group) -> {
+            // Get lanes inside a group
             Map<String, IntersectionData.Lane> lanes = group.getLanes();
-            lanes.forEach((laneKey, lane) -> {
-                Trafficlight tl = new Trafficlight();
-                tl.setPriority(0);
-                tl.setLightState(LightState.rood);
-                tl.setLightId(groupKey.toString() + "." + laneKey);
-                tl.setMs(0);
+            // Create new list for traffic lights inside a group
+            List<Trafficlight> trafficLights = new ArrayList<>();
 
-                stoplichten.put(groupKey.toString(), tl);
+            // Loop through each lane in a group
+            lanes.forEach((laneKey, lane) -> {
+                // Create traffic lights with default values
+                Trafficlight trafficlight = new Trafficlight();
+                // Default values
+                trafficlight.setWeight(0);
+                trafficlight.setLightState(LightState.rood);
+
+                // If roads are central ring, give it a higher baseweight
+                if (groupKey == 2 || groupKey == 8)
+                {
+                    trafficlight.setBaseWeight(1);
+                    trafficlight.setLightState(LightState.rood);
+                }
+                else
+                    trafficlight.setBaseWeight(0);
+
+
+                trafficlight.setLightId(groupKey.toString() + "." + laneKey);
+                trafficlight.setMs(0);
+
+                trafficLights.add(trafficlight);
             });
+
+            // Put the list in dictionary connecting lights to a group
+            stoplichten.put(groupKey.toString(), trafficLights);
         });
     }
 }

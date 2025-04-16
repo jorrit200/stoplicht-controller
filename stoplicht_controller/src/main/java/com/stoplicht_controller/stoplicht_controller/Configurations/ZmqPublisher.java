@@ -10,19 +10,17 @@ import org.zeromq.ZMQ;
 public class ZmqPublisher {
     private final ZContext context;
     private final ZMQ.Socket publisherSocket;
-    private final String adress = "tcp://127.0.0.1:5555";
+    private final String adress = "tcp://10.121.17.45:5555";
 
     public ZmqPublisher() {
         this.context = new ZContext();
         this.publisherSocket = context.createSocket(SocketType.PUB);
         this.publisherSocket.bind(adress);
-
     }
 
     public void sendMessage(String topic, String message) {
-        this.publisherSocket.sendMore(topic.getBytes());
-        this.publisherSocket.send(message.getBytes(ZMQ.CHARSET), 0);
-        //System.out.println("Sent: " + message);
+        this.publisherSocket.sendMore(topic);
+        this.publisherSocket.send(message);
     }
 
     public void close() {

@@ -19,7 +19,7 @@ import java.util.Map;
 public class TestPublisher {
     private final ZContext context;
     private final ZMQ.Socket publisherSocket;
-    private final String adress = "tcp://127.0.0.1:5558";
+    private final String adress = "tcp://127.0.0.1:5559";
     private ObjectMapper objectMapper = new ObjectMapper();
 
     public TestPublisher() {

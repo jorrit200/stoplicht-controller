@@ -9,7 +9,9 @@ import lombok.Setter;
 @Setter
 public class Trafficlight {
     @JsonIgnore
-    private int priority;
+    private int weight;
+    @JsonIgnore
+    private int baseWeight;
     private LightState lightState;
     private String LightId;
     @JsonIgnore
@@ -18,5 +20,9 @@ public class Trafficlight {
     public Trafficlight(){}
 
     public Trafficlight(LightState lightState, int ms) {
+    }
+
+    public int getWeight() {
+        return weight + baseWeight;
     }
 }
