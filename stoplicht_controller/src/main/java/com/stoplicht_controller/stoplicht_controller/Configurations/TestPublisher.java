@@ -58,7 +58,7 @@ public class TestPublisher {
         // Initialize VoorrangsvoertuigRij
         PriorityVehicleQueue priorityVehicleQueue = new PriorityVehicleQueue();
         List<PriorityVehicleQueue.PriorityVehicle> queue = new ArrayList<>();
-        PriorityVehicleQueue.PriorityVehicle voertuig = priorityVehicleQueue.new PriorityVehicle();
+        PriorityVehicleQueue.PriorityVehicle voertuig = new PriorityVehicleQueue.PriorityVehicle(); // Fixed instantiation
         voertuig.setLane("baan1");
         voertuig.setSimulation_time_ms(500);
         voertuig.setPosition(1);
