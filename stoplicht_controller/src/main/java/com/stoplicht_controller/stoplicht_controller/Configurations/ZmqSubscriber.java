@@ -10,6 +10,7 @@ import org.zeromq.ZMQ;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 
 @Configuration
@@ -38,10 +39,17 @@ public class ZmqSubscriber {
         subscriber.connect(this.address);
     }
 
-    public String receiveMessage(String topic) {
-        subscriber.subscribe(topic.getBytes(ZMQ.CHARSET));
-        String contents = subscriber.recvStr(100).trim();
-        System.out.println(contents);
-        return contents;
+    public void subscribeTopics(List<String> topics) {
+        for (String topic : topics) {
+            subscriber.subscribe(topic.getBytes(ZMQ.CHARSET));
+        }
+    }
+
+    public String[] receiveMessage() {
+        // Ontvang multipart bericht: [topic][content]
+        String topic = subscriber.recvStr().trim();
+        String content = subscriber.recvStr().trim();
+
+        return new String[]{topic, content};
     }
 }
