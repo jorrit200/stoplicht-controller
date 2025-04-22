@@ -8,9 +8,9 @@ import lombok.Setter;
 @Setter
 public class SensorSpecial {
     @JsonProperty("brug_wegdek")
-    private boolean bridge_road;
+    private boolean bridge_road_value;
     @JsonProperty("brug_water")
-    private boolean bridge_water;
+    private boolean bridge_water_value;
     @JsonProperty("brug_file")
-    private boolean bridge_traffic;
+    private boolean bridge_traffic_value;
 }

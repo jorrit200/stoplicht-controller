@@ -33,7 +33,7 @@ public class TestPublisher {
         this.publisherSocket.sendMore(topic);
         this.publisherSocket.send(message);
         System.out.println("Sent: [" + topic + "] " + message);
-        Thread.sleep(1000);
+        Thread.sleep(200);
     }
 
     public void startLoop() {
@@ -50,9 +50,9 @@ public class TestPublisher {
 
             // Initialize SensorenSpeciaal
             SensorSpecial sensorSpeciaal = new SensorSpecial();
-            sensorSpeciaal.setBridge_road(true);
-            sensorSpeciaal.setBridge_water(false);
-            sensorSpeciaal.setBridge_traffic(true);
+            sensorSpeciaal.setBridge_road_value(true);
+            sensorSpeciaal.setBridge_water_value(false);
+            sensorSpeciaal.setBridge_traffic_value(true);
 
             // Initialize Tijd
             Time time = new Time();
