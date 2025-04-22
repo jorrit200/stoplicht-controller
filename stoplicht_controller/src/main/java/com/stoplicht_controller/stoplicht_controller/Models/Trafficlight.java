@@ -15,14 +15,18 @@ public class Trafficlight {
     private LightState lightState;
     private String LightId;
     @JsonIgnore
-    private int ms;
+    private int orange_started_ms;
 
     public Trafficlight(){}
 
-    public Trafficlight(LightState lightState, int ms) {
+    public Trafficlight(LightState lightState, int orange_started_ms) {
     }
 
     public int getWeight() {
         return weight + baseWeight;
+    }
+
+    public void addWeight(int weight) {
+        this.weight += weight;
     }
 }

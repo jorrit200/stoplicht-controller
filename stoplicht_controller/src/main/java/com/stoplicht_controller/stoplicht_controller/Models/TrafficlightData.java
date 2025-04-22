@@ -33,7 +33,7 @@ public class TrafficlightData {
                 trafficlight.setWeight(0);
                 trafficlight.setLightState(LightState.rood);
 
-                // If roads are central ring, give it a higher baseweight
+                // If roads are central ring, give it a higher base weight
                 if (groupKey == 2 || groupKey == 8)
                 {
                     trafficlight.setBaseWeight(1);
@@ -44,7 +44,7 @@ public class TrafficlightData {
 
 
                 trafficlight.setLightId(groupKey.toString() + "." + laneKey);
-                trafficlight.setMs(0);
+                trafficlight.setOrange_started_ms(0);
 
                 trafficLights.add(trafficlight);
             });

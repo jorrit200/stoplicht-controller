@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Getter
@@ -20,5 +21,9 @@ public class PriorityVehicleQueue {
         private int simulation_time_ms;
         @JsonProperty("prioriteit")
         private int priority;
+    }
+
+    public void sortQueueBySimulationTime() {
+        queue.sort(Comparator.comparingInt(PriorityVehicleQueue.PriorityVehicle::getSimulation_time_ms));
     }
 }
