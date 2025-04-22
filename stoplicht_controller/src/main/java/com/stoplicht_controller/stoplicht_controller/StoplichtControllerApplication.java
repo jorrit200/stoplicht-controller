@@ -14,8 +14,8 @@ import java.util.concurrent.Executors;
 public class StoplichtControllerApplication {
     @Autowired
     private TrafficlightController trafficlightController;
-    @Autowired
-    private TestPublisher testPublisher;
+//    @Autowired
+//    private TestPublisher testPublisher;
 
     private final ExecutorService executor = Executors.newFixedThreadPool(2);
 
@@ -26,12 +26,12 @@ public class StoplichtControllerApplication {
     @PostConstruct
     public void init() {
         executor.submit(() -> trafficlightController.start());
-        executor.submit(() -> {
-            try {
-                testPublisher.startLoop();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+//        executor.submit(() -> {
+//            try {
+//                testPublisher.startLoop();
+//            } catch (Exception e) {
+//                throw new RuntimeException(e);
+//            }
+//        });
     }
 }

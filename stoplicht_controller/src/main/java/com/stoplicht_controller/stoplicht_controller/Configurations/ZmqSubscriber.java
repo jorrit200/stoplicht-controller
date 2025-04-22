@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 
 @Configuration
@@ -41,12 +42,18 @@ public class ZmqSubscriber {
         subscriber.connect(this.address);
     }
 
-    public String receiveMessage(String topic) {
-        subscriber.subscribe(topic.getBytes(ZMQ.CHARSET));
 
-        String tp = subscriber.recvStr().trim();
-        String contents = subscriber.recvStr().trim();
-        System.out.println("Received: [" + topic + "] " + contents);
-        return contents;
+    public void subscribeTopics(List<String> topics) {
+        for (String topic : topics) {
+            subscriber.subscribe(topic.getBytes(ZMQ.CHARSET));
+        }
+    }
+
+    public String[] receiveMessage() {
+        // Ontvang multipart bericht: [topic][content]
+        String topic = subscriber.recvStr().trim();
+        String content = subscriber.recvStr().trim();
+
+        return new String[]{topic, content};
     }
 }

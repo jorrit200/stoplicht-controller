@@ -45,10 +45,10 @@ public class TrafficlightController {
         while (true) {
             try {
                 //Topics
-                SensorLane sensorLane = jsonMessageReceiver.receiveMessage("sensoren_rijbaan", SensorLane.class);
-                Time time = jsonMessageReceiver.receiveMessage("tijd", Time.class);
-                PriorityVehicleQueue priorityVehicleQueue = jsonMessageReceiver.receiveMessage("voorrangsvoertuig", PriorityVehicleQueue.class);
-                SensorSpecial sensorSpecial = jsonMessageReceiver.receiveMessage("sensoren_speciaal", SensorSpecial.class);
+                SensorLane sensorLane = jsonMessageReceiver.receiveMessage(SensorLane.class);
+                Time time = jsonMessageReceiver.receiveMessage(Time.class);
+                PriorityVehicleQueue priorityVehicleQueue = jsonMessageReceiver.receiveMessage(PriorityVehicleQueue.class);
+                SensorSpecial sensorSpecial = jsonMessageReceiver.receiveMessage(SensorSpecial.class);
 
                 if (current_lane_state == null)
                     current_lane_state = sensorLane;
@@ -119,8 +119,7 @@ public class TrafficlightController {
         }
     }
 
-    public void AddWeightToLane(String lane, int weight)
-    {
+    public void AddWeightToLane(String lane, int weight) {
         String laneKey = lane.split("\\.")[0];
 
         List<Trafficlight> laneGroup = trafficLights.getStoplichten().get(laneKey);

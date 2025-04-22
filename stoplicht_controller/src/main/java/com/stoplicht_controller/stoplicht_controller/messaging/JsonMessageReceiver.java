@@ -2,8 +2,11 @@ package com.stoplicht_controller.stoplicht_controller.messaging;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stoplicht_controller.stoplicht_controller.Configurations.ZmqSubscriber;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class JsonMessageReceiver {
@@ -15,14 +18,27 @@ public class JsonMessageReceiver {
         this.mapper = mapper;
     }
 
-    public <T> T receiveMessage(String topic, Class<T> clazz) {
+    @PostConstruct
+    public void init() {
+        subscriber.subscribeTopics(List.of(
+                "sensoren_rijbaan",
+                "tijd",
+                "voorrangsvoertuig",
+                "sensoren_speciaal"
+        ));
+    }
+    public <T> T receiveMessage(Class<T> clazz) {
         try {
-            String json = subscriber.receiveMessage(topic);
+            String[] received = subscriber.receiveMessage();
+            String json = received[1];
+
+            System.out.println("Ontvangen Topic: " + received[0]);
+            System.out.println("Ontvangen JSON: " + json);
+
             return mapper.readValue(json, clazz);
         } catch (Exception e) {
-            System.err.println("Error receiving or parsing message: " + e.getMessage());
-            //e.printStackTrace();
-            return receiveMessage(topic, clazz);
+            e.printStackTrace();
+            return null;
         }
     }
 }
