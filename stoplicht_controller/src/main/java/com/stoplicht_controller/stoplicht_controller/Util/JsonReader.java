@@ -9,7 +9,8 @@ import java.net.URL;
 @Component
 public class JsonReader {
     public static IntersectionData getTrafficLightConfigFromSpec () {
-        String url = "https://raw.githubusercontent.com/jorrit200/stoplicht-communicatie-spec/main/intersectionData/lanes.json";
+//        String url = "https://raw.githubusercontent.com/jorrit200/stoplicht-communicatie-spec/main/intersectionData/lanes.json";
+        String url = "https://raw.githubusercontent.com/jorrit200/stoplicht-communicatie-spec/The-big-lanes-fix/intersectionData/lanes.json";
         ObjectMapper objectMapper = new ObjectMapper();
 
         try {

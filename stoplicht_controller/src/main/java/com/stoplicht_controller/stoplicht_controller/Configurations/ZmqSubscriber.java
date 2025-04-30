@@ -37,7 +37,7 @@ public class ZmqSubscriber {
 
         // Define the address to connect to
         this.address = "tcp://" + controller.get("host") + ":" + controller.get("port");
-        System.out.println(address);
+        //System.out.println(address);
 
         subscriber.connect(this.address);
     }

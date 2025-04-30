@@ -14,8 +14,11 @@ import com.stoplicht_controller.stoplicht_controller.Models.TrafficlightData;
 import com.stoplicht_controller.stoplicht_controller.Util.JsonReader;
 import com.stoplicht_controller.stoplicht_controller.messaging.JsonMessageReceiver;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.stereotype.Service;
 
+import java.io.Console;
 import java.util.*;
 
 @Service
@@ -36,7 +39,20 @@ public class TrafficlightController {
     private ZmqPublisher zmqPublisher;
 
     private int simulation_time_last_updated_ms;
-    private SensorLane current_lane_state;
+
+    private SensorLane sensorLane;
+    private Time time;
+    private PriorityVehicleQueue priorityVehicleQueue;
+    private SensorSpecial sensorSpecial;
+
+    private Boolean hasSentOrange = false;
+
+    private Map<String, Class<?>> topicClassMap = Map.of(
+            "sensoren_rijbaan", SensorLane.class,
+            "sensoren_speciaal", SensorSpecial.class,
+            "tijd", Time.class,
+            "voorrangsvoertuig", PriorityVehicleQueue.class
+    );
 
     /// Orange implementeren, volgens nederlandse wet 3.5 seconden
     /// Cycle implementeren met puntensysteem
@@ -44,16 +60,38 @@ public class TrafficlightController {
     public void start() {
         while (true) {
             try {
-                //Topics
-                SensorLane sensorLane = jsonMessageReceiver.receiveMessage(SensorLane.class);
-                Time time = jsonMessageReceiver.receiveMessage(Time.class);
-                PriorityVehicleQueue priorityVehicleQueue = jsonMessageReceiver.receiveMessage(PriorityVehicleQueue.class);
-                SensorSpecial sensorSpecial = jsonMessageReceiver.receiveMessage(SensorSpecial.class);
+                String[] received = jsonMessageReceiver.receiveMessage();
+                String topic = received[0];
+                String json = received[1];
 
-                if (current_lane_state == null)
-                    current_lane_state = sensorLane;
+                Class<?> messageClass = topicClassMap.get(topic);
 
-                trafficCycle(sensorLane, time, priorityVehicleQueue, sensorSpecial);
+                if (messageClass == null) {
+                    throw new IllegalArgumentException("Unknown topic: " + topic);
+                }
+
+                if (Objects.equals(topic, "sensoren_rijbaan")) {
+                    json = "{\"sensors\":" + json + "}";
+                }
+                Object castedMessage = objectMapper.readValue(json, messageClass);
+
+                if (castedMessage instanceof SensorLane) {
+                    this.sensorLane = (SensorLane) castedMessage;
+                } else if (castedMessage instanceof Time) {
+                    this.time = (Time) castedMessage;
+                } else if (castedMessage instanceof PriorityVehicleQueue) {
+                    this.priorityVehicleQueue = (PriorityVehicleQueue) castedMessage;
+                } else if (castedMessage instanceof SensorSpecial) {
+                    this.sensorSpecial = (SensorSpecial) castedMessage;
+                } else {
+                    System.out.println("Unknown message type received: " + castedMessage.getClass());
+                }
+
+                //System.out.println("Received: [" + topic + "] Message:\n" + json);
+
+                if (sensorLane != null && time != null && priorityVehicleQueue != null && sensorSpecial != null){
+                    trafficCycle(sensorLane, time, priorityVehicleQueue, sensorSpecial);
+                }
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -63,9 +101,9 @@ public class TrafficlightController {
     }
 
     public void trafficCycle(SensorLane sensorLane, Time time,
-                             PriorityVehicleQueue priorityVehicleQueue, SensorSpecial sensorSpecial) throws JsonProcessingException {
+                             PriorityVehicleQueue priorityVehicleQueue, SensorSpecial sensorSpecial) throws JsonProcessingException, JSONException {
         // If there is a priority queue
-        if (priorityVehicleQueue != null) {
+        if (priorityVehicleQueue.getQueue() != null) {
             // Ensure queue is sorted by lowest simulation time first
             priorityVehicleQueue.sortQueueBySimulationTime();
 
@@ -81,38 +119,41 @@ public class TrafficlightController {
                             hadAmbulance = true;
 
                             // Add weight to ambulance lane, to ensure it will always go green on next cycle
-                            AddWeightToLane(vehicle.getLane(), 5000);
+                            //AddWeightToLane(vehicle.getLane(), 5);
                         }
                     }
                     case 2: { // Bus
-                        AddWeightToLane(vehicle.getLane(), 420);
+                        //AddWeightToLane(vehicle.getLane(), 2);
                     }
                 }
             }
 
-            // Force next light cycle
-            if (hadAmbulance && time != null) {
-                int time_difference = time.getMs() - simulation_time_last_updated_ms;
-                simulation_time_last_updated_ms += 7000 - time_difference;
-            }
+            //Force next light cycle
+//            if (hadAmbulance && time != null) {
+//                int time_difference = time.getMs() - simulation_time_last_updated_ms;
+//                simulation_time_last_updated_ms += 7000 - time_difference;
+//            }
         }
 
         // Check if time != null
         if (time != null) {
-            // Switch green lights to orange
-            if (time.getMs() - simulation_time_last_updated_ms >= 7000 ||
-                    time.getMs() - simulation_time_last_updated_ms < 10500) {
-                // TODO: Wrap this into an if, checking whether green lights are ALLOWED (by transition requirements) to go red
-                ChangeTrafficLights(LightState.oranje);
-
-                sendTrafficLightsToPublisher();
-            }
-
             // Switch orange to red
             if (time.getMs() - simulation_time_last_updated_ms >= 10500) {
                 ChangeTrafficLights(LightState.rood);
 
                 GenerateGreenLightCombination(sensorLane, sensorSpecial);
+                simulation_time_last_updated_ms = time.getMs();
+                hasSentOrange = false;
+
+                sendTrafficLightsToPublisher();
+            }
+
+            // Switch green lights to orange
+            if (time.getMs() - simulation_time_last_updated_ms >= 7000 &&
+                    time.getMs() - simulation_time_last_updated_ms < 10500 && !hasSentOrange) {
+                // TODO: Wrap this into an if, checking whether green lights are ALLOWED (by transition requirements) to go red
+                ChangeTrafficLights(LightState.oranje);
+                hasSentOrange = true;
 
                 sendTrafficLightsToPublisher();
             }
@@ -156,11 +197,11 @@ public class TrafficlightController {
         // Check whether SensorLane had sensor changes
         for (String key : sensorLane.sensors.keySet()) {
             var old_state = sensorLane.sensors.get(key);
-            var new_state = current_lane_state.sensors.get(key);
+            var new_state = this.sensorLane.sensors.get(key);
 
             // If back sensor became true, add 2 weight
             if (!old_state.isBack() && new_state.isBack())
-                AddWeightToLane(key, 2);
+                AddWeightToLane(key, 1);
 
             // if front sensor became true, add 1 weight
             if (!old_state.isFront() && new_state.isFront())
@@ -168,7 +209,7 @@ public class TrafficlightController {
         }
 
         // Update lane state tracked my controller
-        current_lane_state = sensorLane;
+        this.sensorLane = sensorLane;
 
         // Create a list that orders groups by the sum of the lane weight
         Map<String, Integer> group_weight = new HashMap<>();
@@ -199,28 +240,51 @@ public class TrafficlightController {
             light.setLightState(LightState.groen);
         }
 
-        // Set other possible groups to green
-        for (Integer group_key : intersectionData.getGroups().keySet()) {
-            // Get active group
-            var group = intersectionData.getGroups().get(group_key);
+        for (Map.Entry<String,Integer> group_with_weight : sorted_group_weight) {
+            if (Objects.equals(group_with_weight.getKey(), sorted_group_weight.get(0).getKey())) continue;
+
+            var group = intersectionData.getGroups().get(Integer.parseInt(group_with_weight.getKey()));
 
             boolean group_has_conflict = hasGroupConflicts(group);
-            boolean transition_requirements_met = meetsTransitionRequirements(group, sensorSpecial);
+            boolean transition_requirements_met = meetsTransitionRequirements(group_with_weight.getKey(), group, sensorSpecial);
 
             if (!group_has_conflict && transition_requirements_met) {
-                List<Trafficlight> lights_in_group = trafficLights.getStoplichten().get(group_key.toString());
+                List<Trafficlight> lights_in_group = trafficLights.getStoplichten().get(group_with_weight.getKey());
 
                 for (Trafficlight tl : lights_in_group) {
                     tl.setLightState(LightState.groen);
                     // Reset light weight
-                    if (group_key == 2 || group_key == 8) {
-                        tl.setWeight(1);
-                    } else {
-                        tl.setWeight(0);
-                    }
+//                    if (group_key == 2 || group_key == 8) {
+//                        tl.setWeight(1);
+//                    } else {
+                    tl.setWeight(0);
+//                    }
                 }
             }
         }
+
+        // Set other possible groups to green
+//        for (Integer group_key : intersectionData.getGroups().keySet()) {
+//            // Get active group
+//            var group = intersectionData.getGroups().get(group_key);
+//
+//            boolean group_has_conflict = hasGroupConflicts(group);
+//            boolean transition_requirements_met = meetsTransitionRequirements(group_key.toString(), group, sensorSpecial);
+//
+//            if (!group_has_conflict && transition_requirements_met) {
+//                List<Trafficlight> lights_in_group = trafficLights.getStoplichten().get(group_key.toString());
+//
+//                for (Trafficlight tl : lights_in_group) {
+//                    tl.setLightState(LightState.groen);
+//                    // Reset light weight
+////                    if (group_key == 2 || group_key == 8) {
+////                        tl.setWeight(1);
+////                    } else {
+//                        tl.setWeight(0);
+////                    }
+//                }
+//            }
+//        }
 
         // Give remaining red lights extra weight
         keys = trafficLights.getStoplichten().keys();
@@ -250,7 +314,7 @@ public class TrafficlightController {
         return false;
     }
 
-    public boolean meetsTransitionRequirements(IntersectionData.Group group, SensorSpecial sensorSpecial) {
+    public boolean meetsTransitionRequirements(String group_key, IntersectionData.Group group, SensorSpecial sensorSpecial) {
         // If a group doesn't have transition requirements then we can return true by default
         IntersectionData.TransitionRequirements transition_requirements = group.getTransitionRequirements();
         IntersectionData.TransitionRequirements transition_blockers = group.getTransitionBlockers();
@@ -269,7 +333,7 @@ public class TrafficlightController {
                             requirements_met = false;
                         break;
                     case "other_traffic_light":
-                        if (!trafficLights.getStoplichten().get(group.toString()).get(0).getLightState().toString().equals(tr.getTrafficLightState()))
+                        if (!trafficLights.getStoplichten().get(group_key).get(0).getLightState().toString().equals(tr.getTrafficLightState()))
                             requirements_met = false;
                         break;
                 }
@@ -288,13 +352,24 @@ public class TrafficlightController {
             int total = green_transition_requirements.size();
 
             for (IntersectionData.TransitionRequirement tr : green_transition_requirements) {
-                switch (tr.getSensor().toLowerCase()) {
+                switch (tr.getType().toLowerCase()) {
                     case "sensor":
+                        if (tr.getSensor().equals("brug_file_ver_A"))
+                            break;
+
+                        if (tr.getSensor().equals("brug_file_ver_B"))
+                            break;
+
                         if (getSpecialSensorValue(tr.getSensor(), sensorSpecial) == tr.getSensorState())
                             matched++;
                         break;
                     case "other_traffic_light":
-                        if (trafficLights.getStoplichten().get(group.toString()).get(0).getLightState().toString().equals(tr.getTrafficLightState()))
+                        if (trafficLights.getStoplichten()
+                                .get(group_key)
+                                .get(0)
+                                .getLightState()
+                                .toString()
+                                .equals(tr.getTrafficLightState()))
                             matched++;
                         break;
                 }
@@ -319,11 +394,21 @@ public class TrafficlightController {
         };
     }
 
-    private void sendTrafficLightsToPublisher() throws JsonProcessingException {
-        String json = objectMapper.writeValueAsString(trafficLights);
+    private void sendTrafficLightsToPublisher() throws JsonProcessingException, JSONException {
+        JSONObject json = new JSONObject();
 
-        System.out.println("Sent: [" + "stoplichten" + "] " + json);
+        Enumeration<String> Keys = trafficLights.getStoplichten().keys();
+        while (Keys.hasMoreElements()) {
+            String key = Keys.nextElement();
+            List<Trafficlight> groupTrafficLights = trafficLights.getStoplichten().get(key);
 
-        zmqPublisher.sendMessage("stoplichten", json);
+            for (Trafficlight light : groupTrafficLights) {
+                json.put(light.getLightId(), light.getLightState().toString());
+            }
+        }
+
+        System.out.println("Sent: [" + time.getMs() + "] [" + "stoplichten" + "] " + json);
+
+        zmqPublisher.sendMessage("stoplichten", json.toString());
     }
 }

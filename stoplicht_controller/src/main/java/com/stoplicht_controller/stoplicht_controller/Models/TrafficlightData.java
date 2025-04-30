@@ -34,12 +34,12 @@ public class TrafficlightData {
                 trafficlight.setLightState(LightState.rood);
 
                 // If roads are central ring, give it a higher base weight
-                if (groupKey == 2 || groupKey == 8)
-                {
-                    trafficlight.setBaseWeight(1);
-                    trafficlight.setLightState(LightState.rood);
-                }
-                else
+//                if (groupKey == 2 || groupKey == 8)
+//                {
+//                    trafficlight.setBaseWeight(1);
+//                    trafficlight.setLightState(LightState.rood);
+//                }
+//                else
                     trafficlight.setBaseWeight(0);
 
 

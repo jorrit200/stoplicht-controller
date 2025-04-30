@@ -27,6 +27,16 @@ public class JsonMessageReceiver {
                 "sensoren_speciaal"
         ));
     }
+
+    public String[] receiveMessage() {
+        try {
+            return subscriber.receiveMessage();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public <T> T receiveMessage(Class<T> clazz) {
         try {
             String[] received = subscriber.receiveMessage();
@@ -34,8 +44,8 @@ public class JsonMessageReceiver {
 
             System.out.println("Ontvangen Topic: " + received[0]);
             System.out.println("Ontvangen JSON: " + json);
-
-            return mapper.readValue(json, clazz);
+            var test = mapper.readValue(json, clazz);
+            return test;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
