@@ -1,6 +1,6 @@
 {
   "simulator": {
-    "host": "10.121.17.6",
+    "host": "10.121.17.54",
     "port": "5556"
   },
   "controller": {

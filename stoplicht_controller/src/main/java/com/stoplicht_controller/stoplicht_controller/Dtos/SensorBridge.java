@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class Time {
-    @JsonProperty("simulatie_tijd_ms")
-    private int ms = 0;
+public class SensorBridge {
+    @JsonProperty("81.1")
+    private boolean state = false;
 }

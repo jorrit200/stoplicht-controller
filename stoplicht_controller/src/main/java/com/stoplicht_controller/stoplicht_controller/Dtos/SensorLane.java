@@ -5,20 +5,21 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Getter
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SensorLane {
-    public Map<String, SensorStatus> sensors;
+    public Map<String, SensorStatus> sensors = new HashMap<>();
 
     @Getter
     @Setter
     public static class SensorStatus {
         @JsonProperty("voor")
-        private boolean front;
+        private boolean front = false;
         @JsonProperty("achter")
-        private boolean back;
+        private boolean back = false;
     }
 }
